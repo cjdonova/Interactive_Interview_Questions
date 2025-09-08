@@ -1,1 +1,461 @@
+import React, { useState, useMemo } from "react";
 
+// Constants
+const CATEGORIES = [
+  { id: "background", label: "Background / Context", hint: "Set the scene or circumstances." },
+  { id: "experience", label: "Experience", hint: "Lived experiences or processes over time." },
+  { id: "impact", label: "Impact", hint: "Effects, outcomes, or consequences." },
+  { id: "barriers", label: "Barriers", hint: "What gets in the way; challenges." },
+  { id: "supports", label: "Supports", hint: "What helps; resources and enablers." },
+  { id: "solutions", label: "Solutions / Recommendations", hint: "Improvements, advice, or changes." },
+];
+
+const STEMS = [
+  "How do you…",
+  "What happens when…",
+  "In what ways…",
+  "Can you walk me through…",
+  "Tell me about a time when…",
+  "What would you change about…",
+  "What matters most to you about…",
+];
+
+const FOLLOW_UPS = [
+  "Can you give a specific example?",
+  "What happened next?",
+  "How did that affect you?",
+  "Could you say more about that?",
+  "Who or what helped, if anyone?",
+  "If you had to prioritize, what comes first and why?",
+];
+
+const QUALITY_RULES = [
+  { id: "ties", label: "Clearly tied to the research topic/question" },
+  { id: "open", label: "Open-ended (not yes/no)" },
+  { id: "neutral", label: "Neutral (not leading)" },
+  { id: "clear", label: "Clear, simple wording (no jargon)" },
+  { id: "detail", label: "Encourages detailed, story-rich answers" },
+];
+
+const BAD_TO_BETTER = [
+  {
+    bad: "Don’t you think the clinic is understaffed?",
+    better: "How does staffing at the clinic affect your experience?",
+    why: "Removes bias and invites participant framing.",
+  },
+  {
+    bad: "Do you feel safe using public transit to the clinic?",
+    better: "What is your experience using public transit to reach the clinic?",
+    why: "Open-ended prompts richer detail.",
+  },
+  {
+    bad: "How do costs and wait times affect your care and satisfaction?",
+    better: "How do out-of-pocket costs affect your decisions about care?",
+    why: "Avoid double‑barrelled questions.",
+  },
+  {
+    bad: "Isn’t alcohol obviously harmful to students?",
+    better: "In what ways, if any, does alcohol use affect students’ daily life?",
+    why: "Neutral tone, leaves room for range of experiences.",
+  },
+];
+
+const TYPES_TABLE = [
+  { type: "Open-ended", desc: "Encourages depth", example: "Can you describe…?", use: "Yes" },
+  { type: "Probing", desc: "Follow-up for detail", example: "Can you say more about that?", use: "Yes" },
+  { type: "Demographic", desc: "Background info", example: "What year are you in school?", use: "Yes, briefly" },
+  { type: "Closed", desc: "Yes/No only", example: "Do you…?", use: "Use sparingly" },
+  { type: "Leading", desc: "Suggests an answer", example: "Wouldn’t you agree…?", use: "No" },
+  { type: "Double‑barrelled", desc: "Two at once", example: "How do costs and wait times…?", use: "Split it" },
+  { type: "Hypothetical", desc: "Imagined scenario", example: "What would you do if…?", use: "Use cautiously" },
+];
+
+// Section component
+function Section({ title, subtitle, children, id }) {
+  return (
+    <section id={id} className="bg-white rounded-2xl shadow p-6 border border-slate-200 mb-6">
+      <header className="mb-4">
+        <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+        {subtitle && <p className="text-slate-600 mt-1">{subtitle}</p>}
+      </header>
+      {children}
+    </section>
+  );
+}
+
+function Badge({ ok }) {
+  return (
+    <span className={
+      "inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium border " +
+      (ok ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200")
+    }>
+      <span className={"h-2 w-2 rounded-full " + (ok ? "bg-emerald-500" : "bg-rose-500")} />
+      {ok ? "Looks strong" : "Needs work"}
+    </span>
+  );
+}
+
+// Main app
+export default function InterviewQuestionBuilder() {
+  // State
+  const [topic, setTopic] = useState("");
+  const [category, setCategory] = useState("experience");
+  const [stem, setStem] = useState(STEMS[0]);
+  const [question, setQuestion] = useState("");
+  const [followUp, setFollowUp] = useState("");
+  const [checks, setChecks] = useState(() => QUALITY_RULES.reduce((acc, r) => ({ ...acc, [r.id]: false }), {}));
+  const [activeTab, setActiveTab] = useState("builder");
+
+  // Helper
+  const strength = useMemo(() => {
+    const total = QUALITY_RULES.length;
+    const done = Object.values(checks).filter(Boolean).length;
+    return { done, total, ok: done >= Math.ceil(total * 0.8) };
+  }, [checks]);
+
+  const preview = useMemo(() => {
+    const cat = CATEGORIES.find((c) => c.id === category)?.label || "";
+    return {
+      main: question.trim() || (stem + " …"),
+      follow: followUp.trim(),
+      meta: { topic: topic.trim(), category: cat }
+    };
+  }, [question, followUp, topic, category, stem]);
+
+  // UI actions
+  function copyText() {
+    const text =
+      `Interview Question\nTopic: ${preview.meta.topic || "—"}\nCategory: ${preview.meta.category}\nQ: ${preview.main}\nFollow-up: ${preview.follow || "(optional)"}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      alert("Copied to clipboard!");
+    } else {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      alert("Copied to clipboard!");
+    }
+  }
+
+  function resetAll() {
+    if (!window.confirm("Clear the current draft?")) return;
+    setTopic("");
+    setCategory("experience");
+    setStem(STEMS[0]);
+    setQuestion("");
+    setFollowUp("");
+    setChecks(QUALITY_RULES.reduce((acc, r) => ({ ...acc, [r.id]: false }), {}));
+  }
+
+  function markAllHelpful(val) {
+    const next = {};
+    QUALITY_RULES.forEach((r) => (next[r.id] = val));
+    setChecks(next);
+  }
+
+  // Tabs
+  const tabs = [
+    { id: "builder", label: "Builder" },
+    { id: "guide", label: "Reference Guide" },
+    { id: "examples", label: "Rewrites & Types" },
+  ];
+
+  return (
+    <div className="max-w-5xl mx-auto px-2 py-8">
+      <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-2">Interactive Interview Question Builder</h1>
+      <p className="text-slate-600 mb-6">A step-by-step tool to draft a clear, neutral, open-ended interview question with an optional follow-up.</p>
+      {/* Tabs */}
+      <div className="flex items-center gap-2 mb-6">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            className={
+              "px-3 py-2 rounded-full text-sm font-medium border transition " +
+              (activeTab === t.id
+                ? "bg-slate-900 text-white border-slate-900"
+                : "bg-white border-slate-200 hover:bg-slate-100")
+            }
+            onClick={() => setActiveTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {/* Builder Tab */}
+      {activeTab === "builder" &&
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Main workflow */}
+          <div className="lg:col-span-3 space-y-6">
+            <Section
+              id="topic"
+              title="Step 0 — Your Research Topic / Question"
+              subtitle="What area or guiding question will your interview explore? Keep this short and specific."
+            >
+              <textarea
+                className="w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                rows={3}
+                placeholder="e.g., How do first‑generation students navigate access to campus mental health services?"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+              />
+              <p className="text-xs text-slate-500 mt-2">Tip: You’re not writing interview questions yet—just anchoring the scope.</p>
+            </Section>
+            <Section id="focus" title="Step 1 — Choose a Focus" subtitle="Pick one lens for your question.">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {CATEGORIES.map((c) => (
+                  <label
+                    key={c.id}
+                    className={
+                      "cursor-pointer rounded-xl border p-3 transition bg-white " +
+                      (category === c.id
+                        ? "border-slate-900 ring-1 ring-slate-900"
+                        : "border-slate-300 hover:border-slate-400")
+                    }
+                  >
+                    <input
+                      type="radio"
+                      name="category"
+                      value={c.id}
+                      checked={category === c.id}
+                      onChange={() => setCategory(c.id)}
+                      className="sr-only"
+                    />
+                    <div className="font-medium">{c.label}</div>
+                    <div className="text-xs text-slate-600 mt-1">{c.hint}</div>
+                  </label>
+                ))}
+              </div>
+            </Section>
+            <Section
+              id="draft"
+              title="Step 2 — Draft Your Interview Question"
+              subtitle="Start with a neutral stem and stay tightly aligned to your topic."
+            >
+              <div className="flex flex-wrap gap-2 mb-3">
+                {STEMS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setStem(s)}
+                    className={(stem === s ? "bg-slate-900 text-white " : "bg-white text-slate-900 ") +
+                      "px-3 py-1.5 rounded-full border border-slate-300 text-sm"}
+                    title="Set as starting stem"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-slate-700">Interview question</label>
+                  <input
+                    type="text"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    placeholder={stem + " …"}
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Quick helpers</label>
+                  <div className="mt-1 grid grid-cols-1 gap-2">
+                    <button
+                      onClick={() => setQuestion((q) => (q ? q + " " : "") + stem.replace(/…$/, "") + " …")}
+                      className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
+                    >
+                      Insert stem
+                    </button>
+                    <button
+                      onClick={() => setQuestion("")}
+                      className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
+                    >
+                      Clear field
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 mt-2">Keep it single‑focus, neutral, and open‑ended.</p>
+            </Section>
+            <Section id="follow" title="Step 3 — Add a Possible Follow‑Up (optional)" subtitle="Use if you get short answers.">
+              <div className="flex flex-wrap gap-2 mb-3">
+                {FOLLOW_UPS.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFollowUp(f)}
+                    className={(followUp === f ? "bg-slate-900 text-white " : "bg-white text-slate-900 ") +
+                      "px-3 py-1.5 rounded-full border border-slate-300 text-sm"}
+                    title="Use this follow‑up"
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                className="w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                placeholder="e.g., Can you give a specific example?"
+                value={followUp}
+                onChange={(e) => setFollowUp(e.target.value)}
+              />
+            </Section>
+            <Section id="quality" title="Step 4 — Quality Check" subtitle="Tick each box when your question meets the criterion.">
+              <div className="flex items-center gap-3 mb-3">
+                <Badge ok={strength.ok} />
+                <div className="text-sm text-slate-600">{strength.done}/{strength.total} checks completed</div>
+                <div className="ml-auto flex gap-2">
+                  <button
+                    onClick={() => markAllHelpful(true)}
+                    className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
+                  >
+                    Mark all ✓
+                  </button>
+                  <button
+                    onClick={() => markAllHelpful(false)}
+                    className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {QUALITY_RULES.map((r) => (
+                  <label key={r.id} className="flex items-start gap-3 p-3 rounded-xl border border-slate-300 bg-white">
+                    <input
+                      type="checkbox"
+                      className="mt-1 h-4 w-4"
+                      checked={!!checks[r.id]}
+                      onChange={(e) => setChecks({ ...checks, [r.id]: e.target.checked })}
+                    />
+                    <span className="text-sm">{r.label}</span>
+                  </label>
+                ))}
+              </div>
+            </Section>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={copyText} className="rounded-lg bg-slate-900 text-white px-4 py-2 text-sm">Copy</button>
+              <button onClick={() => window.print()} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm">Print</button>
+              <button onClick={resetAll} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm">Reset</button>
+            </div>
+          </div>
+          {/* Preview Pane */}
+          <div className="lg:col-span-2">
+            <Section title="Live Preview" subtitle="This is what you'll actually ask.">
+              <div className="space-y-4">
+                <div className="rounded-xl border border-slate-300 bg-slate-50 p-4">
+                  <div className="text-xs uppercase tracking-wide text-slate-500">Topic</div>
+                  <div className="text-sm mt-1">{preview.meta.topic || <em className="text-slate-500">(not set)</em>}</div>
+                  <div className="mt-4 text-xs uppercase tracking-wide text-slate-500">Category</div>
+                  <div className="text-sm mt-1">{preview.meta.category}</div>
+                  <div className="mt-4 text-xs uppercase tracking-wide text-slate-500">Question</div>
+                  <div className="mt-1 text-base font-medium">{preview.main}</div>
+                  <div className="mt-4 text-xs uppercase tracking-wide text-slate-500">Follow‑up (optional)</div>
+                  <div className="text-sm mt-1">{preview.follow || <span className="text-slate-500">—</span>}</div>
+                </div>
+                <details className="rounded-xl border border-slate-200 bg-white p-4">
+                  <summary className="cursor-pointer font-medium">Quick self‑audit prompts</summary>
+                  <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+                    <li>Could the question be answered with “yes/no”? If so, reopen it.</li>
+                    <li>Is there any implied judgement or assumption? Neutralize it.</li>
+                    <li>Is it two questions stuck together? Split them.</li>
+                    <li>Does it invite a story, sequence, or example?</li>
+                    <li>Is the language plain (no jargon or acronyms)?</li>
+                  </ul>
+                </details>
+              </div>
+            </Section>
+          </div>
+        </div>
+      }
+      {/* Guide Tab */}
+      {activeTab === "guide" &&
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Section title="Interview Guide — Categories" subtitle="Match your lens to the aim of your study.">
+            <ul className="space-y-2 text-sm">
+              {CATEGORIES.map((c) => (
+                <li key={c.id} className="rounded-lg border border-slate-200 bg-white p-3">
+                  <div className="font-medium">{c.label}</div>
+                  <div className="text-slate-600">{c.hint}</div>
+                </li>
+              ))}
+            </ul>
+          </Section>
+          <Section title="Helpful Stems & Follow‑ups" subtitle="Mix and match as needed.">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <div className="text-sm font-medium mb-2">Stems</div>
+                <ul className="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                  {STEMS.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <div className="text-sm font-medium mb-2">Follow-ups</div>
+                <ul className="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                  {FOLLOW_UPS.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </Section>
+        </div>
+      }
+      {/* Examples Tab */}
+      {activeTab === "examples" &&
+        <div className="grid grid-cols-1 gap-6">
+          <Section title="Bad → Better (Rewrite Helper)" subtitle="Neutral, open, single‑focus prompts richer data.">
+            <div className="space-y-3">
+              {BAD_TO_BETTER.map((row, idx) => (
+                <div key={idx} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <div className="text-sm"><span className="font-medium">Bad:</span> {row.bad}</div>
+                  <div className="text-sm mt-1"><span className="font-medium">Better:</span> {row.better}</div>
+                  <div className="text-xs text-slate-600 mt-1">Why: {row.why}</div>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm"
+                      onClick={() => setQuestion(row.better)}
+                      title="Use ‘Better’ as my draft"
+                    >
+                      Use this as my question
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+          <Section title="Types of Questions (Quick Reference)">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm border border-slate-200">
+                <thead className="bg-slate-100">
+                  <tr>
+                    <th className="text-left p-3 border-b border-slate-200">Type</th>
+                    <th className="text-left p-3 border-b border-slate-200">Description</th>
+                    <th className="text-left p-3 border-b border-slate-200">Example</th>
+                    <th className="text-left p-3 border-b border-slate-200">Use</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TYPES_TABLE.map((t, i) => (
+                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                      <td className="p-3 align-top">{t.type}</td>
+                      <td className="p-3 align-top text-slate-700">{t.desc}</td>
+                      <td className="p-3 align-top text-slate-700">{t.example}</td>
+                      <td className="p-3 align-top">{t.use}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Section>
+        </div>
+      }
+      <footer className="mt-10 text-center text-xs text-slate-500">
+        Built for student and practitioner use. Print‑friendly. Your drafts are stored in your browser only.
+      </footer>
+    </div>
+  );
+}
