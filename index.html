@@ -218,7 +218,7 @@
     <div class="container">
         <div class="header">
             <h1>Interview Question Generator</h1>
-            <p>Step-by-step tool for crafting strong answers to common interview questions</p>
+            <p>Step-by-step tool for crafting strong answers to interview questions</p>
         </div>
         <div class="progress">
             <div class="progress-line">
@@ -232,7 +232,7 @@
                 <h2 class="step-title">Welcome</h2>
                 <div class="section">
                     <h3>What you'll do</h3>
-                    <p>This interactive tool helps you choose common interview questions, build strong answers, and evaluate your responses to prepare for success.</p>
+                    <p>This interactive tool guides you through selecting interview question types, building strong answers, and evaluating your responses to help you prepare for interviews.</p>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-primary" onclick="nextStep()">Start</button>
@@ -240,31 +240,31 @@
             </div>
             <!-- Step 2 -->
             <div class="step" id="step2">
-                <h2 class="step-title">Select Interview Questions</h2>
+                <h2 class="step-title">Choose Question Type</h2>
                 <div class="section">
-                    <h3>Choose up to 3 to practice:</h3>
-                    <div class="card" data-question="about-yourself" onclick="selectQuestion(this)">
-                        <h4>Tell me about yourself</h4>
-                        <p>Share your background and experiences relevant to the role.</p>
+                    <h3>What type of interview question do you want to practice?</h3>
+                    <div class="card" onclick="selectType(this, 'behavioral')">
+                        <h4>Behavioral</h4>
+                        <p>Questions about how you handled situations in the past (e.g., challenges, teamwork, mistakes).</p>
                     </div>
-                    <div class="card" data-question="strengths" onclick="selectQuestion(this)">
-                        <h4>What are your strengths?</h4>
-                        <p>Highlight your key skills and qualities.</p>
+                    <div class="card" onclick="selectType(this, 'motivational')">
+                        <h4>Motivational</h4>
+                        <p>Questions about your goals, why you want the job, interests, and career plans.</p>
                     </div>
-                    <div class="card" data-question="weakness" onclick="selectQuestion(this)">
-                        <h4>What is your greatest weakness?</h4>
-                        <p>Describe an area for improvement and how you address it.</p>
+                    <div class="card" onclick="selectType(this, 'strengths')">
+                        <h4>Strengths & Weaknesses</h4>
+                        <p>Questions about your best qualities and areas for improvement.</p>
                     </div>
-                    <div class="card" data-question="why-role" onclick="selectQuestion(this)">
-                        <h4>Why do you want this role?</h4>
-                        <p>Explain your motivation and fit for the position.</p>
+                    <div class="card" onclick="selectType(this, 'skills')">
+                        <h4>Skills & Experience</h4>
+                        <p>Questions about your technical skills, experience, and expertise.</p>
                     </div>
-                    <div class="card" data-question="challenge" onclick="selectQuestion(this)">
-                        <h4>Describe a challenge you've overcome</h4>
-                        <p>Share how you handled a difficult situation.</p>
+                    <div class="card" onclick="selectType(this, 'other')">
+                        <h4>Other</h4>
+                        <p>Anything else you'd like to practice!</p>
                     </div>
-                    <div id="question-feedback" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; font-size: 14px; color: #666;">
-                        Select up to 3 questions
+                    <div id="type-feedback" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; font-size: 14px; color: #666;">
+                        Select a question type to continue
                     </div>
                 </div>
                 <div class="btn-group">
@@ -274,10 +274,16 @@
             </div>
             <!-- Step 3 -->
             <div class="step" id="step3">
-                <h2 class="step-title">Draft Your Answers</h2>
-                <div class="section" id="answer-section">
-                    <h3>Write your answers</h3>
-                    <div id="answers"></div>
+                <h2 class="step-title">Build Your Interview Question</h2>
+                <div class="section">
+                    <h3>Customize your interview question</h3>
+                    <div class="form-group">
+                        <label>Enter a specific question you'd like to practice</label>
+                        <input type="text" id="customQuestion" placeholder="e.g., Tell me about a time you overcame a challenge">
+                        <div class="hint" id="suggested-hint"></div>
+                    </div>
+                    <button class="btn btn-action" onclick="generateQuestion()">Generate Interview Question</button>
+                    <div id="questionResult"></div>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-previous" onclick="prevStep()">Previous</button>
@@ -286,7 +292,14 @@
             </div>
             <!-- Step 4 -->
             <div class="step" id="step4">
-                <h2 class="step-title">Evaluate Your Answers</h2>
+                <h2 class="step-title">Draft Your Answer</h2>
+                <div class="section">
+                    <h3>Write your answer</h3>
+                    <div class="form-group">
+                        <label>Your Answer</label>
+                        <textarea id="customAnswer" rows="4" placeholder="Type your answer here..."></textarea>
+                    </div>
+                </div>
                 <div class="section">
                     <h3>Quality checklist</h3>
                     <div class="checklist-item" onclick="toggleCheck(this)">
@@ -330,10 +343,12 @@
                 <h2 class="step-title">Congratulations</h2>
                 <div class="final">
                     <h3>Practice Complete</h3>
-                    <p>You're one step closer to acing your next interview! Review your answers and continue practicing to build confidence.</p>
+                    <p>You're one step closer to acing your next interview! Review your question and answer below.</p>
                     <div style="margin: 20px 0; padding: 16px; border-left: 2px solid #2acaea;">
-                        <strong>Your Practiced Answers:</strong>
-                        <div id="final-answers" style="margin-top: 12px; text-align: left;"></div>
+                        <strong>Your Interview Question:</strong>
+                        <div id="final-question" style="margin: 10px 0; text-align: left;"></div>
+                        <strong>Your Answer:</strong>
+                        <div id="final-answer" style="margin: 10px 0; text-align: left;"></div>
                     </div>
                 </div>
                 <div class="section">
@@ -352,8 +367,9 @@
     </div>
     <script>
         let currentStep = 1;
-        let selectedQuestions = [];
-        let answers = {};
+        let selectedType = "";
+        let customQuestion = "";
+        let customAnswer = "";
 
         function updateProgress() {
             const progress = (currentStep / 5) * 100;
@@ -366,10 +382,10 @@
             document.getElementById('step' + step).classList.add('active');
             updateProgress();
             if (step === 3) {
-                renderAnswerFields();
+                updateHint();
             }
             if (step === 5) {
-                renderFinalAnswers();
+                renderFinal();
             }
         }
 
@@ -387,85 +403,46 @@
             }
         }
 
-        function selectQuestion(card) {
-            const selectedCards = document.querySelectorAll('.card.selected');
-            const feedback = document.getElementById('question-feedback');
-            const questionKey = card.getAttribute('data-question');
-            if (card.classList.contains('selected')) {
-                card.classList.remove('selected');
-                selectedQuestions = selectedQuestions.filter(q => q !== questionKey);
-            } else {
-                if (selectedCards.length >= 3) {
-                    feedback.innerHTML = '<span style="color: #cc0002;">Maximum 3 questions allowed. Deselect one to choose another.</span>';
-                    return;
-                }
-                card.classList.add('selected');
-                selectedQuestions.push(questionKey);
-            }
-            const newSelectedCards = document.querySelectorAll('.card.selected');
-            if (newSelectedCards.length === 0) {
-                feedback.innerHTML = 'Select up to 3 questions';
-            } else if (newSelectedCards.length === 1) {
-                feedback.innerHTML = '<span style="color: #2acaea;">1 question selected. You can select 2 more.</span>';
-            } else if (newSelectedCards.length < 3) {
-                feedback.innerHTML = `<span style="color: #2acaea;">${newSelectedCards.length} questions selected. You can select ${3 - newSelectedCards.length} more.</span>`;
-            } else {
-                feedback.innerHTML = '<span style="color: #4fc14f;">3 questions selected (maximum reached)</span>';
+        function selectType(card, type) {
+            document.querySelectorAll('#step2 .card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedType = type;
+            let feedback = document.getElementById('type-feedback');
+            feedback.innerHTML = `<span style="color:#2acaea;">${card.querySelector('h4').textContent} selected.</span>`;
+        }
+
+        function updateHint() {
+            let hint = document.getElementById('suggested-hint');
+            switch(selectedType) {
+                case 'behavioral':
+                    hint.textContent = "Tip: Use the STAR method (Situation, Task, Action, Result) in your answer.";
+                    break;
+                case 'motivational':
+                    hint.textContent = "Tip: Align your motivation with the company's mission and values.";
+                    break;
+                case 'strengths':
+                    hint.textContent = "Tip: Pick real strengths and weaknesses, and show self-awareness.";
+                    break;
+                case 'skills':
+                    hint.textContent = "Tip: Highlight skills that match the job description.";
+                    break;
+                default:
+                    hint.textContent = "";
             }
         }
 
-        function renderAnswerFields() {
-            const container = document.getElementById('answers');
-            container.innerHTML = '';
-            if (selectedQuestions.length === 0) {
-                container.innerHTML = '<p style="color:#cc0002;">No questions selected. Go back to select questions!</p>';
+        function generateQuestion() {
+            customQuestion = document.getElementById('customQuestion').value.trim();
+            if (!customQuestion) {
+                document.getElementById('questionResult').innerHTML =
+                    '<div class="result" style="border-left-color:#cc0002;background:#fff5f5;">' +
+                    '<strong>Please enter your interview question.</strong>' +
+                    '</div>';
                 return;
             }
-            selectedQuestions.forEach(q => {
-                let label = '';
-                if (q === 'about-yourself') label = 'Tell me about yourself';
-                if (q === 'strengths') label = 'What are your strengths?';
-                if (q === 'weakness') label = 'What is your greatest weakness?';
-                if (q === 'why-role') label = 'Why do you want this role?';
-                if (q === 'challenge') label = "Describe a challenge you've overcome";
-                container.innerHTML += `
-                    <div class="form-group">
-                        <label for="answer_${q}">${label}</label>
-                        <textarea id="answer_${q}" rows="3" placeholder="Type your answer here...">${answers[q] || ''}</textarea>
-                    </div>
-                `;
-            });
+            document.getElementById('questionResult').innerHTML =
+                `<div class="result"><strong>Your Interview Question:</strong><br>"${customQuestion}"</div>`;
         }
-
-        function renderFinalAnswers() {
-            const container = document.getElementById('final-answers');
-            container.innerHTML = '';
-            selectedQuestions.forEach(q => {
-                let label = '';
-                if (q === 'about-yourself') label = 'Tell me about yourself';
-                if (q === 'strengths') label = 'What are your strengths?';
-                if (q === 'weakness') label = 'What is your greatest weakness?';
-                if (q === 'why-role') label = 'Why do you want this role?';
-                if (q === 'challenge') label = "Describe a challenge you've overcome";
-                let val = answers[q] || document.getElementById('answer_' + q)?.value || '';
-                container.innerHTML += `
-                    <div style="margin-bottom:18px;">
-                        <strong>${label}</strong><br>
-                        <span style="color:#666;">${val ? val.replace(/\n/g, '<br>') : '<em>(No answer provided)</em>'}</span>
-                    </div>
-                `;
-            });
-        }
-
-        // Save answers before moving forward
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('btn-primary') || e.target.classList.contains('btn')) {
-                selectedQuestions.forEach(q => {
-                    const val = document.getElementById('answer_' + q)?.value || '';
-                    answers[q] = val;
-                });
-            }
-        });
 
         function toggleCheck(item) {
             const checkbox = item.querySelector('.checkbox');
@@ -481,16 +458,30 @@
             expand.textContent = item.classList.contains('expanded') ? '×' : '+';
         }
 
+        function renderFinal() {
+            customQuestion = document.getElementById('customQuestion').value.trim();
+            customAnswer = document.getElementById('customAnswer').value.trim();
+            document.getElementById('final-question').innerHTML =
+                customQuestion ? `"${customQuestion}"` : '<em>(No question provided)</em>';
+            document.getElementById('final-answer').innerHTML =
+                customAnswer ? customAnswer.replace(/\n/g, '<br>') : '<em>(No answer provided)</em>';
+        }
+
         function restart() {
             currentStep = 1;
-            selectedQuestions = [];
-            answers = {};
+            selectedType = "";
+            customQuestion = "";
+            customAnswer = "";
             showStep(1);
             document.querySelectorAll('.card').forEach(function(card) {
                 card.classList.remove('selected');
             });
-            document.getElementById('question-feedback').innerHTML = 'Select up to 3 questions';
-            document.getElementById('final-answers').innerHTML = '';
+            document.getElementById('type-feedback').innerHTML = "Select a question type to continue";
+            document.getElementById('questionResult').innerHTML = "";
+            document.getElementById('customQuestion').value = "";
+            document.getElementById('customAnswer').value = "";
+            document.getElementById('final-question').innerHTML = "";
+            document.getElementById('final-answer').innerHTML = "";
         }
 
         updateProgress();
