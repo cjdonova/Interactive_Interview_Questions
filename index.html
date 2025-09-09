@@ -147,14 +147,31 @@
             background: white;
             font-size: 16px;
         }
-        .quality-checklist { margin-top: 12px; }
+        .quality-checklist {
+            margin-top: 12px;
+        }
         .quality-item {
-            margin-bottom: 10px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
+            gap: 10px;
             cursor: pointer;
+            padding: 8px 0;
         }
-        .quality-item input[type="checkbox"] { margin-right: 12px; }
+        .quality-item input[type="checkbox"] {
+            accent-color: #2acaea;
+            width: 20px;
+            height: 20px;
+            margin: 0;
+        }
+        .quality-item label {
+            font-size: 16px;
+            color: #222;
+            font-weight: 400;
+            cursor: pointer;
+            margin: 0;
+            line-height: 1.2;
+        }
         .preview-box {
             margin: 32px 0;
             padding: 18px;
@@ -163,11 +180,27 @@
             font-size: 16px;
             color: #333;
         }
+        .example-box {
+            background: #e9f7fa;
+            border-left: 3px solid #2acaea;
+            padding: 16px;
+            margin-bottom: 18px;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .example-label {
+            font-size: 13px;
+            color: #2acaea;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 7px;
+        }
         @media (max-width: 600px) {
             .container { padding: 0 12px; }
             .header h1 { font-size: 28px; }
             .step-title { font-size: 20px; }
             .btn { padding: 12px 18px; font-size: 15px; margin: 0 6px; }
+            .example-box, .preview-box { font-size: 15px; }
         }
     </style>
 </head>
@@ -224,6 +257,9 @@
             <!-- Step 3: Write Main Question & Follow-up -->
             <div class="step" id="step3">
                 <h2 class="step-title">Step 3: Draft Your Question</h2>
+                <div class="example-box" id="exampleBox">
+                    <!-- Example question goes here -->
+                </div>
                 <div class="form-group">
                     <label for="mainQuestionInput">Main Interview Question</label>
                     <input type="text" id="mainQuestionInput" placeholder="Write your open-ended question here">
@@ -288,20 +324,22 @@
             "What would you change about…",
             "What matters most to you about…"
         ];
-        const FOLLOW_UPS = [
-            "Can you give a specific example?",
-            "What happened next?",
-            "How did that affect you?",
-            "Could you say more about that?",
-            "Who or what helped, if anyone?",
-            "If you had to prioritize, what comes first and why?"
-        ];
         const QUALITY_RULES = [
             { id: "ties", label: "Clearly tied to the research topic/question" },
             { id: "open", label: "Open-ended (not yes/no)" },
             { id: "neutral", label: "Neutral (not leading)" },
             { id: "clear", label: "Clear, simple wording (no jargon)" },
             { id: "detail", label: "Encourages detailed, story-rich answers" }
+        ];
+        // Example question templates for each stem
+        const EXAMPLE_QUESTION_TEMPLATES = [
+            "How do you… access healthcare services in your community?",
+            "What happens when… you try to get medical care during weekends?",
+            "In what ways… does transportation affect your ability to see a doctor?",
+            "Can you walk me through… your experience scheduling a healthcare appointment?",
+            "Tell me about a time when… you faced a challenge getting treatment.",
+            "What would you change about… the local clinic experience?",
+            "What matters most to you about… receiving healthcare in your area?"
         ];
 
         // State
@@ -324,7 +362,10 @@
             document.getElementById('step' + step).classList.add('active');
             updateProgress();
             if (step === 2) renderStemCards();
-            if (step === 3) renderPreview();
+            if (step === 3) {
+                renderPreview();
+                renderExample();
+            }
             if (step === 4) renderChecklist();
             if (step === 5) renderFinalPreview();
         }
@@ -369,6 +410,45 @@
             });
         }
 
+        // Step 3: Example question
+        function renderExample() {
+            const idx = STEMS.indexOf(stem);
+            // Use the user's topic and category if provided, or a default phrase
+            let example = "";
+            if (topic && category) {
+                // Try to insert the topic/category context into the example
+                switch (stem) {
+                    case "How do you…":
+                        example = `How do you… experience ${topic} in terms of ${category.replace(/_/g," ")}?`;
+                        break;
+                    case "What happens when…":
+                        example = `What happens when… you deal with ${topic} issues?`;
+                        break;
+                    case "In what ways…":
+                        example = `In what ways… does ${topic} relate to ${category.replace(/_/g," ")}?`;
+                        break;
+                    case "Can you walk me through…":
+                        example = `Can you walk me through… your experience with ${topic}?`;
+                        break;
+                    case "Tell me about a time when…":
+                        example = `Tell me about a time when… you faced ${topic} challenges.`;
+                        break;
+                    case "What would you change about…":
+                        example = `What would you change about… ${topic} and its impact on ${category.replace(/_/g," ")}?`;
+                        break;
+                    case "What matters most to you about…":
+                        example = `What matters most to you about… ${topic} in your life?`;
+                        break;
+                    default:
+                        example = EXAMPLE_QUESTION_TEMPLATES[idx] || "";
+                }
+            } else {
+                example = EXAMPLE_QUESTION_TEMPLATES[idx] || "";
+            }
+            document.getElementById("exampleBox").innerHTML =
+                `<span class="example-label">Example using this stem:</span>${example}`;
+        }
+
         // Step 3: Question input
         document.getElementById("mainQuestionInput").addEventListener("input", function() {
             question = this.value;
@@ -396,6 +476,7 @@
             QUALITY_RULES.forEach((rule, idx) => {
                 const item = document.createElement("div");
                 item.className = "quality-item";
+                const label = document.createElement("label");
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
                 checkbox.checked = checks[idx];
@@ -403,8 +484,9 @@
                     checks[idx] = this.checked;
                     updateQualityBadge();
                 };
-                item.appendChild(checkbox);
-                item.appendChild(document.createTextNode(rule.label));
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(" " + rule.label));
+                item.appendChild(label);
                 checklistDiv.appendChild(item);
             });
             updateQualityBadge();
