@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Interview Questions</title>
+    <title>Interview Question Generator</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -130,13 +130,6 @@
         .feedback.show { display: block; }
         .feedback.error, .feedback.success { border-left-color: #2acaea; }
         .feedback.warning { border-left-color: #ffd700; }
-        .example {
-            margin: 40px 0;
-            padding: 20px;
-            border-left: 2px solid #2acaea;
-            background: white;
-        }
-        .example h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #000; }
         .btn-group { text-align: center; margin-top: 60px; }
         .btn, .btn-primary {
             background: #cc0002;
@@ -224,8 +217,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Interactive Interview Questions</h1>
-            <p>Practice and master your interview skills step by step</p>
+            <h1>Interview Question Generator</h1>
+            <p>Step-by-step tool for crafting strong answers to common interview questions</p>
         </div>
         <div class="progress">
             <div class="progress-line">
@@ -239,7 +232,7 @@
                 <h2 class="step-title">Welcome</h2>
                 <div class="section">
                     <h3>What you'll do</h3>
-                    <p>This interactive tool guides you through practicing common interview questions, building strong answers, and evaluating your responses to help you prepare for interviews.</p>
+                    <p>This interactive tool helps you choose common interview questions, build strong answers, and evaluate your responses to prepare for success.</p>
                 </div>
                 <div class="btn-group">
                     <button class="btn btn-primary" onclick="nextStep()">Start</button>
@@ -247,11 +240,10 @@
             </div>
             <!-- Step 2 -->
             <div class="step" id="step2">
-                <h2 class="step-title">Common Interview Questions</h2>
+                <h2 class="step-title">Select Interview Questions</h2>
                 <div class="section">
-                    <h3>Choose questions to practice</h3>
-                    <p>Select up to 3 questions to focus on:</p>
-                    <div class="card" data-question="tell-me-about-yourself" onclick="selectQuestion(this)">
+                    <h3>Choose up to 3 to practice:</h3>
+                    <div class="card" data-question="about-yourself" onclick="selectQuestion(this)">
                         <h4>Tell me about yourself</h4>
                         <p>Share your background and experiences relevant to the role.</p>
                     </div>
@@ -259,11 +251,11 @@
                         <h4>What are your strengths?</h4>
                         <p>Highlight your key skills and qualities.</p>
                     </div>
-                    <div class="card" data-question="weaknesses" onclick="selectQuestion(this)">
+                    <div class="card" data-question="weakness" onclick="selectQuestion(this)">
                         <h4>What is your greatest weakness?</h4>
                         <p>Describe an area for improvement and how you address it.</p>
                     </div>
-                    <div class="card" data-question="why-this-role" onclick="selectQuestion(this)">
+                    <div class="card" data-question="why-role" onclick="selectQuestion(this)">
                         <h4>Why do you want this role?</h4>
                         <p>Explain your motivation and fit for the position.</p>
                     </div>
@@ -431,10 +423,10 @@
             }
             selectedQuestions.forEach(q => {
                 let label = '';
-                if (q === 'tell-me-about-yourself') label = 'Tell me about yourself';
+                if (q === 'about-yourself') label = 'Tell me about yourself';
                 if (q === 'strengths') label = 'What are your strengths?';
-                if (q === 'weaknesses') label = 'What is your greatest weakness?';
-                if (q === 'why-this-role') label = 'Why do you want this role?';
+                if (q === 'weakness') label = 'What is your greatest weakness?';
+                if (q === 'why-role') label = 'Why do you want this role?';
                 if (q === 'challenge') label = "Describe a challenge you've overcome";
                 container.innerHTML += `
                     <div class="form-group">
@@ -450,10 +442,10 @@
             container.innerHTML = '';
             selectedQuestions.forEach(q => {
                 let label = '';
-                if (q === 'tell-me-about-yourself') label = 'Tell me about yourself';
+                if (q === 'about-yourself') label = 'Tell me about yourself';
                 if (q === 'strengths') label = 'What are your strengths?';
-                if (q === 'weaknesses') label = 'What is your greatest weakness?';
-                if (q === 'why-this-role') label = 'Why do you want this role?';
+                if (q === 'weakness') label = 'What is your greatest weakness?';
+                if (q === 'why-role') label = 'Why do you want this role?';
                 if (q === 'challenge') label = "Describe a challenge you've overcome";
                 let val = answers[q] || document.getElementById('answer_' + q)?.value || '';
                 container.innerHTML += `
