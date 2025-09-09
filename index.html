@@ -1,461 +1,475 @@
-import React, { useState, useMemo } from "react";
-
-// Constants
-const CATEGORIES = [
-  { id: "background", label: "Background / Context", hint: "Set the scene or circumstances." },
-  { id: "experience", label: "Experience", hint: "Lived experiences or processes over time." },
-  { id: "impact", label: "Impact", hint: "Effects, outcomes, or consequences." },
-  { id: "barriers", label: "Barriers", hint: "What gets in the way; challenges." },
-  { id: "supports", label: "Supports", hint: "What helps; resources and enablers." },
-  { id: "solutions", label: "Solutions / Recommendations", hint: "Improvements, advice, or changes." },
-];
-
-const STEMS = [
-  "How do you…",
-  "What happens when…",
-  "In what ways…",
-  "Can you walk me through…",
-  "Tell me about a time when…",
-  "What would you change about…",
-  "What matters most to you about…",
-];
-
-const FOLLOW_UPS = [
-  "Can you give a specific example?",
-  "What happened next?",
-  "How did that affect you?",
-  "Could you say more about that?",
-  "Who or what helped, if anyone?",
-  "If you had to prioritize, what comes first and why?",
-];
-
-const QUALITY_RULES = [
-  { id: "ties", label: "Clearly tied to the research topic/question" },
-  { id: "open", label: "Open-ended (not yes/no)" },
-  { id: "neutral", label: "Neutral (not leading)" },
-  { id: "clear", label: "Clear, simple wording (no jargon)" },
-  { id: "detail", label: "Encourages detailed, story-rich answers" },
-];
-
-const BAD_TO_BETTER = [
-  {
-    bad: "Don’t you think the clinic is understaffed?",
-    better: "How does staffing at the clinic affect your experience?",
-    why: "Removes bias and invites participant framing.",
-  },
-  {
-    bad: "Do you feel safe using public transit to the clinic?",
-    better: "What is your experience using public transit to reach the clinic?",
-    why: "Open-ended prompts richer detail.",
-  },
-  {
-    bad: "How do costs and wait times affect your care and satisfaction?",
-    better: "How do out-of-pocket costs affect your decisions about care?",
-    why: "Avoid double‑barrelled questions.",
-  },
-  {
-    bad: "Isn’t alcohol obviously harmful to students?",
-    better: "In what ways, if any, does alcohol use affect students’ daily life?",
-    why: "Neutral tone, leaves room for range of experiences.",
-  },
-];
-
-const TYPES_TABLE = [
-  { type: "Open-ended", desc: "Encourages depth", example: "Can you describe…?", use: "Yes" },
-  { type: "Probing", desc: "Follow-up for detail", example: "Can you say more about that?", use: "Yes" },
-  { type: "Demographic", desc: "Background info", example: "What year are you in school?", use: "Yes, briefly" },
-  { type: "Closed", desc: "Yes/No only", example: "Do you…?", use: "Use sparingly" },
-  { type: "Leading", desc: "Suggests an answer", example: "Wouldn’t you agree…?", use: "No" },
-  { type: "Double‑barrelled", desc: "Two at once", example: "How do costs and wait times…?", use: "Split it" },
-  { type: "Hypothetical", desc: "Imagined scenario", example: "What would you do if…?", use: "Use cautiously" },
-];
-
-// Section component
-function Section({ title, subtitle, children, id }) {
-  return (
-    <section id={id} className="bg-white rounded-2xl shadow p-6 border border-slate-200 mb-6">
-      <header className="mb-4">
-        <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
-        {subtitle && <p className="text-slate-600 mt-1">{subtitle}</p>}
-      </header>
-      {children}
-    </section>
-  );
-}
-
-function Badge({ ok }) {
-  return (
-    <span className={
-      "inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium border " +
-      (ok ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200")
-    }>
-      <span className={"h-2 w-2 rounded-full " + (ok ? "bg-emerald-500" : "bg-rose-500")} />
-      {ok ? "Looks strong" : "Needs work"}
-    </span>
-  );
-}
-
-// Main app
-export default function InterviewQuestionBuilder() {
-  // State
-  const [topic, setTopic] = useState("");
-  const [category, setCategory] = useState("experience");
-  const [stem, setStem] = useState(STEMS[0]);
-  const [question, setQuestion] = useState("");
-  const [followUp, setFollowUp] = useState("");
-  const [checks, setChecks] = useState(() => QUALITY_RULES.reduce((acc, r) => ({ ...acc, [r.id]: false }), {}));
-  const [activeTab, setActiveTab] = useState("builder");
-
-  // Helper
-  const strength = useMemo(() => {
-    const total = QUALITY_RULES.length;
-    const done = Object.values(checks).filter(Boolean).length;
-    return { done, total, ok: done >= Math.ceil(total * 0.8) };
-  }, [checks]);
-
-  const preview = useMemo(() => {
-    const cat = CATEGORIES.find((c) => c.id === category)?.label || "";
-    return {
-      main: question.trim() || (stem + " …"),
-      follow: followUp.trim(),
-      meta: { topic: topic.trim(), category: cat }
-    };
-  }, [question, followUp, topic, category, stem]);
-
-  // UI actions
-  function copyText() {
-    const text =
-      `Interview Question\nTopic: ${preview.meta.topic || "—"}\nCategory: ${preview.meta.category}\nQ: ${preview.main}\nFollow-up: ${preview.follow || "(optional)"}`;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-      alert("Copied to clipboard!");
-    } else {
-      // fallback
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      alert("Copied to clipboard!");
-    }
-  }
-
-  function resetAll() {
-    if (!window.confirm("Clear the current draft?")) return;
-    setTopic("");
-    setCategory("experience");
-    setStem(STEMS[0]);
-    setQuestion("");
-    setFollowUp("");
-    setChecks(QUALITY_RULES.reduce((acc, r) => ({ ...acc, [r.id]: false }), {}));
-  }
-
-  function markAllHelpful(val) {
-    const next = {};
-    QUALITY_RULES.forEach((r) => (next[r.id] = val));
-    setChecks(next);
-  }
-
-  // Tabs
-  const tabs = [
-    { id: "builder", label: "Builder" },
-    { id: "guide", label: "Reference Guide" },
-    { id: "examples", label: "Rewrites & Types" },
-  ];
-
-  return (
-    <div className="max-w-5xl mx-auto px-2 py-8">
-      <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-2">Interactive Interview Question Builder</h1>
-      <p className="text-slate-600 mb-6">A step-by-step tool to draft a clear, neutral, open-ended interview question with an optional follow-up.</p>
-      {/* Tabs */}
-      <div className="flex items-center gap-2 mb-6">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            className={
-              "px-3 py-2 rounded-full text-sm font-medium border transition " +
-              (activeTab === t.id
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white border-slate-200 hover:bg-slate-100")
-            }
-            onClick={() => setActiveTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      {/* Builder Tab */}
-      {activeTab === "builder" &&
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Main workflow */}
-          <div className="lg:col-span-3 space-y-6">
-            <Section
-              id="topic"
-              title="Step 0 — Your Research Topic / Question"
-              subtitle="What area or guiding question will your interview explore? Keep this short and specific."
-            >
-              <textarea
-                className="w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                rows={3}
-                placeholder="e.g., How do first‑generation students navigate access to campus mental health services?"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-              />
-              <p className="text-xs text-slate-500 mt-2">Tip: You’re not writing interview questions yet—just anchoring the scope.</p>
-            </Section>
-            <Section id="focus" title="Step 1 — Choose a Focus" subtitle="Pick one lens for your question.">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {CATEGORIES.map((c) => (
-                  <label
-                    key={c.id}
-                    className={
-                      "cursor-pointer rounded-xl border p-3 transition bg-white " +
-                      (category === c.id
-                        ? "border-slate-900 ring-1 ring-slate-900"
-                        : "border-slate-300 hover:border-slate-400")
-                    }
-                  >
-                    <input
-                      type="radio"
-                      name="category"
-                      value={c.id}
-                      checked={category === c.id}
-                      onChange={() => setCategory(c.id)}
-                      className="sr-only"
-                    />
-                    <div className="font-medium">{c.label}</div>
-                    <div className="text-xs text-slate-600 mt-1">{c.hint}</div>
-                  </label>
-                ))}
-              </div>
-            </Section>
-            <Section
-              id="draft"
-              title="Step 2 — Draft Your Interview Question"
-              subtitle="Start with a neutral stem and stay tightly aligned to your topic."
-            >
-              <div className="flex flex-wrap gap-2 mb-3">
-                {STEMS.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setStem(s)}
-                    className={(stem === s ? "bg-slate-900 text-white " : "bg-white text-slate-900 ") +
-                      "px-3 py-1.5 rounded-full border border-slate-300 text-sm"}
-                    title="Set as starting stem"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-slate-700">Interview question</label>
-                  <input
-                    type="text"
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                    placeholder={stem + " …"}
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700">Quick helpers</label>
-                  <div className="mt-1 grid grid-cols-1 gap-2">
-                    <button
-                      onClick={() => setQuestion((q) => (q ? q + " " : "") + stem.replace(/…$/, "") + " …")}
-                      className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
-                    >
-                      Insert stem
-                    </button>
-                    <button
-                      onClick={() => setQuestion("")}
-                      className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
-                    >
-                      Clear field
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 mt-2">Keep it single‑focus, neutral, and open‑ended.</p>
-            </Section>
-            <Section id="follow" title="Step 3 — Add a Possible Follow‑Up (optional)" subtitle="Use if you get short answers.">
-              <div className="flex flex-wrap gap-2 mb-3">
-                {FOLLOW_UPS.map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFollowUp(f)}
-                    className={(followUp === f ? "bg-slate-900 text-white " : "bg-white text-slate-900 ") +
-                      "px-3 py-1.5 rounded-full border border-slate-300 text-sm"}
-                    title="Use this follow‑up"
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
-              <input
-                type="text"
-                className="w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                placeholder="e.g., Can you give a specific example?"
-                value={followUp}
-                onChange={(e) => setFollowUp(e.target.value)}
-              />
-            </Section>
-            <Section id="quality" title="Step 4 — Quality Check" subtitle="Tick each box when your question meets the criterion.">
-              <div className="flex items-center gap-3 mb-3">
-                <Badge ok={strength.ok} />
-                <div className="text-sm text-slate-600">{strength.done}/{strength.total} checks completed</div>
-                <div className="ml-auto flex gap-2">
-                  <button
-                    onClick={() => markAllHelpful(true)}
-                    className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
-                  >
-                    Mark all ✓
-                  </button>
-                  <button
-                    onClick={() => markAllHelpful(false)}
-                    className="rounded-lg border border-slate-300 px-3 py-2 bg-white hover:bg-slate-50 text-sm"
-                  >
-                    Clear all
-                  </button>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {QUALITY_RULES.map((r) => (
-                  <label key={r.id} className="flex items-start gap-3 p-3 rounded-xl border border-slate-300 bg-white">
-                    <input
-                      type="checkbox"
-                      className="mt-1 h-4 w-4"
-                      checked={!!checks[r.id]}
-                      onChange={(e) => setChecks({ ...checks, [r.id]: e.target.checked })}
-                    />
-                    <span className="text-sm">{r.label}</span>
-                  </label>
-                ))}
-              </div>
-            </Section>
-            <div className="flex flex-wrap gap-2">
-              <button onClick={copyText} className="rounded-lg bg-slate-900 text-white px-4 py-2 text-sm">Copy</button>
-              <button onClick={() => window.print()} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm">Print</button>
-              <button onClick={resetAll} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm">Reset</button>
-            </div>
-          </div>
-          {/* Preview Pane */}
-          <div className="lg:col-span-2">
-            <Section title="Live Preview" subtitle="This is what you'll actually ask.">
-              <div className="space-y-4">
-                <div className="rounded-xl border border-slate-300 bg-slate-50 p-4">
-                  <div className="text-xs uppercase tracking-wide text-slate-500">Topic</div>
-                  <div className="text-sm mt-1">{preview.meta.topic || <em className="text-slate-500">(not set)</em>}</div>
-                  <div className="mt-4 text-xs uppercase tracking-wide text-slate-500">Category</div>
-                  <div className="text-sm mt-1">{preview.meta.category}</div>
-                  <div className="mt-4 text-xs uppercase tracking-wide text-slate-500">Question</div>
-                  <div className="mt-1 text-base font-medium">{preview.main}</div>
-                  <div className="mt-4 text-xs uppercase tracking-wide text-slate-500">Follow‑up (optional)</div>
-                  <div className="text-sm mt-1">{preview.follow || <span className="text-slate-500">—</span>}</div>
-                </div>
-                <details className="rounded-xl border border-slate-200 bg-white p-4">
-                  <summary className="cursor-pointer font-medium">Quick self‑audit prompts</summary>
-                  <ul className="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
-                    <li>Could the question be answered with “yes/no”? If so, reopen it.</li>
-                    <li>Is there any implied judgement or assumption? Neutralize it.</li>
-                    <li>Is it two questions stuck together? Split them.</li>
-                    <li>Does it invite a story, sequence, or example?</li>
-                    <li>Is the language plain (no jargon or acronyms)?</li>
-                  </ul>
-                </details>
-              </div>
-            </Section>
-          </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Interview Question Builder</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.7;
+            font-size: 18px;
+            font-weight: 300;
+        }
+        .container {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .header { padding: 60px 0 20px; text-align: center; }
+        .header h1 {
+            font-size: 38px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 16px;
+        }
+        .header p {
+            font-size: 18px;
+            color: #666;
+            font-weight: 600;
+        }
+        .progress {
+            text-align: center;
+            padding: 32px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .progress-line {
+            width: 80px;
+            height: 2px;
+            background: #f0f0f0;
+            margin: 0 auto 12px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #2acaea;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        .step-num { font-size: 14px; color: #999; }
+        .content { padding: 40px 0 80px; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .step-title {
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #000;
+        }
+        .section { margin: 40px 0; }
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #000;
+        }
+        .card {
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+        .card h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .card.selected {
+            border-color: #4fc14f;
+            background: #f0fff0;
+            box-shadow: 0 4px 12px rgba(79, 193, 79, 0.2);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 600;
+            background: #2acaea;
+            color: #fff;
+            margin-top: 8px;
+        }
+        .badge.bad { background: #ffd700; color: #000; }
+        .badge.good { background: #4fc14f; }
+        .form-group { margin-bottom: 32px; }
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #000;
+            font-weight: 600;
+        }
+        input, textarea, select {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            padding: 12px 0;
+            font-size: 16px;
+            background: transparent;
+            transition: border-color 0.2s;
+            color: #000;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-bottom-color: #2acaea; }
+        .hint { font-size: 12px; color: #999; margin-top: 8px; }
+        .btn-group { text-align: center; margin-top: 40px; }
+        .btn, .btn-primary {
+            background: #cc0002;
+            color: white;
+            border: none;
+            display: inline-block;
+            padding: 14px 28px;
+            margin: 0 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .btn:hover, .btn-primary:hover {
+            background: #dd6263;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.14);
+        }
+        .btn-previous {
+            background: #2acaea !important;
+            color: #fff !important;
+        }
+        .btn-previous:hover, .btn-previous:focus {
+            background: #7be9f4 !important;
+            color: #fff !important;
+        }
+        .result {
+            margin-top: 24px;
+            padding: 16px;
+            border-left: 2px solid #ffd700;
+            background: white;
+            font-size: 16px;
+        }
+        .quality-checklist { margin-top: 12px; }
+        .quality-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .quality-item input[type="checkbox"] { margin-right: 12px; }
+        .preview-box {
+            margin: 32px 0;
+            padding: 18px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 16px;
+            color: #333;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 0 12px; }
+            .header h1 { font-size: 28px; }
+            .step-title { font-size: 20px; }
+            .btn { padding: 12px 18px; font-size: 15px; margin: 0 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Interactive Interview Question Builder</h1>
+            <p>A step-by-step tool to draft clear, open-ended interview questions.</p>
         </div>
-      }
-      {/* Guide Tab */}
-      {activeTab === "guide" &&
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Section title="Interview Guide — Categories" subtitle="Match your lens to the aim of your study.">
-            <ul className="space-y-2 text-sm">
-              {CATEGORIES.map((c) => (
-                <li key={c.id} className="rounded-lg border border-slate-200 bg-white p-3">
-                  <div className="font-medium">{c.label}</div>
-                  <div className="text-slate-600">{c.hint}</div>
-                </li>
-              ))}
-            </ul>
-          </Section>
-          <Section title="Helpful Stems & Follow‑ups" subtitle="Mix and match as needed.">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <div className="text-sm font-medium mb-2">Stems</div>
-                <ul className="list-disc pl-5 text-sm text-slate-700 space-y-1">
-                  {STEMS.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <div className="text-sm font-medium mb-2">Follow-ups</div>
-                <ul className="list-disc pl-5 text-sm text-slate-700 space-y-1">
-                  {FOLLOW_UPS.map((f) => (
-                    <li key={f}>{f}</li>
-                  ))}
-                </ul>
-              </div>
+        <div class="progress">
+            <div class="progress-line">
+                <div class="progress-fill" id="progress"></div>
             </div>
-          </Section>
+            <div class="step-num">Step <span id="stepNum">1</span> of 5</div>
         </div>
-      }
-      {/* Examples Tab */}
-      {activeTab === "examples" &&
-        <div className="grid grid-cols-1 gap-6">
-          <Section title="Bad → Better (Rewrite Helper)" subtitle="Neutral, open, single‑focus prompts richer data.">
-            <div className="space-y-3">
-              {BAD_TO_BETTER.map((row, idx) => (
-                <div key={idx} className="rounded-xl border border-slate-200 bg-white p-4">
-                  <div className="text-sm"><span className="font-medium">Bad:</span> {row.bad}</div>
-                  <div className="text-sm mt-1"><span className="font-medium">Better:</span> {row.better}</div>
-                  <div className="text-xs text-slate-600 mt-1">Why: {row.why}</div>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm"
-                      onClick={() => setQuestion(row.better)}
-                      title="Use ‘Better’ as my draft"
-                    >
-                      Use this as my question
-                    </button>
-                  </div>
+        <div class="content">
+            <!-- Step 1: Topic and Category -->
+            <div class="step active" id="step1">
+                <h2 class="step-title">Step 1: Topic & Category</h2>
+                <div class="section">
+                    <div class="form-group">
+                        <label for="topicInput">Interview Topic</label>
+                        <input type="text" id="topicInput" placeholder="e.g., access to healthcare">
+                        <div class="hint">What's the general focus of your interview?</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Question Category</label>
+                        <select id="categoryInput">
+                            <option value="background">Background / Context</option>
+                            <option value="experience">Experience</option>
+                            <option value="impact">Impact</option>
+                            <option value="barriers">Barriers</option>
+                            <option value="supports">Supports</option>
+                            <option value="solutions">Solutions / Recommendations</option>
+                        </select>
+                        <div class="hint" id="categoryHint">Set the scene or circumstances.</div>
+                    </div>
                 </div>
-              ))}
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
             </div>
-          </Section>
-          <Section title="Types of Questions (Quick Reference)">
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm border border-slate-200">
-                <thead className="bg-slate-100">
-                  <tr>
-                    <th className="text-left p-3 border-b border-slate-200">Type</th>
-                    <th className="text-left p-3 border-b border-slate-200">Description</th>
-                    <th className="text-left p-3 border-b border-slate-200">Example</th>
-                    <th className="text-left p-3 border-b border-slate-200">Use</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {TYPES_TABLE.map((t, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                      <td className="p-3 align-top">{t.type}</td>
-                      <td className="p-3 align-top text-slate-700">{t.desc}</td>
-                      <td className="p-3 align-top text-slate-700">{t.example}</td>
-                      <td className="p-3 align-top">{t.use}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <!-- Step 2: Choose a Stem -->
+            <div class="step" id="step2">
+                <h2 class="step-title">Step 2: Choose a Question Stem</h2>
+                <div class="section">
+                    <div id="stemCards"></div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
             </div>
-          </Section>
+            <!-- Step 3: Write Main Question & Follow-up -->
+            <div class="step" id="step3">
+                <h2 class="step-title">Step 3: Draft Your Question</h2>
+                <div class="form-group">
+                    <label for="mainQuestionInput">Main Interview Question</label>
+                    <input type="text" id="mainQuestionInput" placeholder="Write your open-ended question here">
+                </div>
+                <div class="form-group">
+                    <label for="followupInput">Optional Follow-up</label>
+                    <input type="text" id="followupInput" placeholder="e.g., Can you give a specific example?">
+                </div>
+                <div class="preview-box" id="previewBox"></div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+            <!-- Step 4: Quality Checklist -->
+            <div class="step" id="step4">
+                <h2 class="step-title">Step 4: Quality Checklist</h2>
+                <div class="section">
+                    <h3>Does your question meet these criteria?</h3>
+                    <div class="quality-checklist" id="qualityChecklist"></div>
+                    <span class="badge" id="qualityBadge"></span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+            <!-- Step 5: Copy & Finish -->
+            <div class="step" id="step5">
+                <h2 class="step-title">Step 5: Ready to Use!</h2>
+                <div class="section">
+                    <h3>Your Interview Question</h3>
+                    <div class="preview-box" id="finalPreview"></div>
+                </div>
+                <div class="section">
+                    <button class="btn btn-action" onclick="copyQuestion()">Copy to Clipboard</button>
+                    <span id="copyStatus" style="margin-left: 16px; color: #2acaea;"></span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn" onclick="restart()">Start Over</button>
+                </div>
+            </div>
         </div>
-      }
-      <footer className="mt-10 text-center text-xs text-slate-500">
-        Built for student and practitioner use. Print‑friendly. Your drafts are stored in your browser only.
-      </footer>
     </div>
-  );
-}
+    <script>
+        // Constants
+        const CATEGORIES = {
+            background: "Set the scene or circumstances.",
+            experience: "Lived experiences or processes over time.",
+            impact: "Effects, outcomes, or consequences.",
+            barriers: "What gets in the way; challenges.",
+            supports: "What helps; resources and enablers.",
+            solutions: "Improvements, advice, or changes."
+        };
+        const STEMS = [
+            "How do you…",
+            "What happens when…",
+            "In what ways…",
+            "Can you walk me through…",
+            "Tell me about a time when…",
+            "What would you change about…",
+            "What matters most to you about…"
+        ];
+        const FOLLOW_UPS = [
+            "Can you give a specific example?",
+            "What happened next?",
+            "How did that affect you?",
+            "Could you say more about that?",
+            "Who or what helped, if anyone?",
+            "If you had to prioritize, what comes first and why?"
+        ];
+        const QUALITY_RULES = [
+            { id: "ties", label: "Clearly tied to the research topic/question" },
+            { id: "open", label: "Open-ended (not yes/no)" },
+            { id: "neutral", label: "Neutral (not leading)" },
+            { id: "clear", label: "Clear, simple wording (no jargon)" },
+            { id: "detail", label: "Encourages detailed, story-rich answers" }
+        ];
+
+        // State
+        let currentStep = 1;
+        let topic = "";
+        let category = "background";
+        let categoryHint = CATEGORIES["background"];
+        let stem = STEMS[0];
+        let question = "";
+        let followup = "";
+        let checks = QUALITY_RULES.map(() => false);
+
+        function updateProgress() {
+            document.getElementById('progress').style.width = (currentStep / 5 * 100) + '%';
+            document.getElementById('stepNum').textContent = currentStep;
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            updateProgress();
+            if (step === 2) renderStemCards();
+            if (step === 3) renderPreview();
+            if (step === 4) renderChecklist();
+            if (step === 5) renderFinalPreview();
+        }
+
+        function nextStep() {
+            if (currentStep < 5) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        // Step 1 handlers
+        document.getElementById("categoryInput").addEventListener("change", function() {
+            category = this.value;
+            categoryHint = CATEGORIES[category];
+            document.getElementById("categoryHint").textContent = categoryHint;
+        });
+        document.getElementById("topicInput").addEventListener("input", function() {
+            topic = this.value;
+        });
+
+        // Step 2: Stem cards
+        function renderStemCards() {
+            const stemCards = document.getElementById("stemCards");
+            stemCards.innerHTML = "";
+            STEMS.forEach((s, idx) => {
+                const div = document.createElement("div");
+                div.className = "card" + (stem === s ? " selected" : "");
+                div.textContent = s;
+                div.onclick = () => {
+                    stem = s;
+                    renderStemCards();
+                };
+                stemCards.appendChild(div);
+            });
+        }
+
+        // Step 3: Question input
+        document.getElementById("mainQuestionInput").addEventListener("input", function() {
+            question = this.value;
+            renderPreview();
+        });
+        document.getElementById("followupInput").addEventListener("input", function() {
+            followup = this.value;
+            renderPreview();
+        });
+
+        function renderPreview() {
+            let catLabel = CATEGORIES[category] ? category : "";
+            let previewText =
+                "<strong>Topic:</strong> " + (topic || "—") + "<br>" +
+                "<strong>Category:</strong> " + category.charAt(0).toUpperCase() + category.slice(1) + "<br>" +
+                "<strong>Question:</strong> " + (question.trim() || stem + " …") + "<br>" +
+                "<strong>Follow-up:</strong> " + (followup.trim() || "(optional)");
+            document.getElementById("previewBox").innerHTML = previewText;
+        }
+
+        // Step 4: Quality checklist
+        function renderChecklist() {
+            const checklistDiv = document.getElementById("qualityChecklist");
+            checklistDiv.innerHTML = "";
+            QUALITY_RULES.forEach((rule, idx) => {
+                const item = document.createElement("div");
+                item.className = "quality-item";
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = checks[idx];
+                checkbox.onchange = function() {
+                    checks[idx] = this.checked;
+                    updateQualityBadge();
+                };
+                item.appendChild(checkbox);
+                item.appendChild(document.createTextNode(rule.label));
+                checklistDiv.appendChild(item);
+            });
+            updateQualityBadge();
+        }
+        function updateQualityBadge() {
+            const done = checks.filter(Boolean).length;
+            const total = QUALITY_RULES.length;
+            const ok = done >= Math.ceil(total * 0.8);
+            const badge = document.getElementById("qualityBadge");
+            badge.textContent = ok ? "Looks strong" : "Needs work";
+            badge.className = "badge " + (ok ? "good" : "bad");
+        }
+
+        // Step 5: Final preview and copy
+        function renderFinalPreview() {
+            let previewText =
+                "<strong>Topic:</strong> " + (topic || "—") + "<br>" +
+                "<strong>Category:</strong> " + category.charAt(0).toUpperCase() + category.slice(1) + "<br>" +
+                "<strong>Question:</strong> " + (question.trim() || stem + " …") + "<br>" +
+                "<strong>Follow-up:</strong> " + (followup.trim() || "(optional)");
+            document.getElementById("finalPreview").innerHTML = previewText;
+            document.getElementById("copyStatus").textContent = "";
+        }
+        function copyQuestion() {
+            const text =
+                "Interview Question\n" +
+                "Topic: " + (topic || "—") + "\n" +
+                "Category: " + category.charAt(0).toUpperCase() + category.slice(1) + "\n" +
+                "Q: " + (question.trim() || stem + " …") + "\n" +
+                "Follow-up: " + (followup.trim() || "(optional)");
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text);
+                document.getElementById("copyStatus").textContent = "Copied!";
+            } else {
+                // Fallback for older browsers
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                document.getElementById("copyStatus").textContent = "Copied!";
+            }
+        }
+
+        // Restart everything
+        function restart() {
+            currentStep = 1;
+            topic = "";
+            category = "background";
+            stem = STEMS[0];
+            question = "";
+            followup = "";
+            checks = QUALITY_RULES.map(() => false);
+            document.getElementById("topicInput").value = "";
+            document.getElementById("categoryInput").value = "background";
+            document.getElementById("categoryHint").textContent = CATEGORIES["background"];
+            document.getElementById("mainQuestionInput").value = "";
+            document.getElementById("followupInput").value = "";
+            showStep(1);
+        }
+
+        // Initial render
+        renderPreview();
+        updateProgress();
+    </script>
+</body>
+</html>
