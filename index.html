@@ -15,55 +15,57 @@
   .soft{background:#f8fafc}
   .muted{color:#475569}
   .hint{color:#64748b;margin:.25rem 0 .5rem}
-  textarea,input[type=text]{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px}
+  textarea,input[type=text]{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:16px;font-size:1.14rem;min-height:90px}
   textarea{resize:vertical}
-  textarea.big,input[type=text].big{font-size:1.14rem;min-height:90px;}
   .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:8px 12px;font-size:.92rem;cursor:pointer}
-  .chip[aria-pressed="true"]{background:#0f172a;color:#fff;border-color:#0f172a}
+  .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:10px 16px;font-size:1rem;cursor:pointer}
+  .chip[aria-pressed="true"],.chip:focus{background:#0f172a;color:#fff;border-color:#0f172a}
   .chip:focus{outline:2px solid #2acaea}
-  .summary,.exbox{border:1px dashed #cbd5e1;background:#fff;border-radius:12px;padding:12px}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .btn{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:10px 12px;font-size:.95rem;cursor:pointer}
+  .summary,.exbox{border:1px dashed #cbd5e1;background:#fff;border-radius:12px;padding:16px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;justify-content:center}
+  .btn{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:14px 26px;font-size:1.05rem;cursor:pointer;font-weight:600}
   .btn.primary{background:#0f172a;color:#fff;border-color:#0f172a}
   .btn:focus{outline:2px solid #2acaea}
-  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
-  .kicker{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
-  table{width:100%;border-collapse:collapse;font-size:.95rem}
-  th,td{border:1px solid #e2e8f0;padding:8px;text-align:left;vertical-align:top}
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .kicker{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
+  table{width:100%;border-collapse:collapse;font-size:1rem}
+  th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}
   thead th{background:#f1f5f9}
-  .tiny{font-size:.86rem}
+  .tiny{font-size:.89rem}
+  .hidden{display:none!important}
+  .status-message{background:#e0f2fe;color:#0f172a;padding:10px 18px;border-radius:8px;text-align:center;font-size:1rem;margin:18px 0;display:none}
   @media (max-width:600px){
     .wrap{padding:0 4px}
     .panel,.soft{padding:8px}
     .chips{gap:4px}
-    .btn{padding:10px 6px;font-size:.95rem}
+    .btn{padding:12px 7px;font-size:1rem}
     .row{grid-template-columns:1fr}
-    textarea.big,input[type=text].big{font-size:1.03rem;min-height:76px;}
+    textarea,input[type=text]{font-size:1rem;min-height:70px;}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <!-- Intro -->
-  <header class="panel soft">
+  <div id="statusMessage" class="status-message" aria-live="polite"></div>
+
+  <!-- Step 1: Intro & RQ -->
+  <section class="panel soft" id="step1">
     <h1>Research Interview Question Builder</h1>
     <p class="muted">
-      Use this to draft a <strong>research interview question</strong> for a public-health study — not a job interview question.
-      You will: review question types, choose a <em>focus</em>, choose a <em>question role</em>, select a <em>stem</em>, draft your question, and run a <em>quality check</em>.
+      This step-by-step tool helps you draft a <strong>research interview question</strong> for a public-health study (not a job interview).<br>
+      You'll review question types, choose a <em>focus</em>, select a <em>question role</em>, pick a <em>stem</em>, draft your question, and complete a <em>quality check</em>.
     </p>
-  </header>
-
-  <!-- RQ first: tie everything to the research question -->
-  <section class="panel soft">
     <div class="kicker">Start here</div>
     <h2>Your Research Question (RQ)</h2>
     <p class="hint">Type the RQ guiding your interview. Your interview question must help generate evidence toward this RQ.</p>
-    <textarea id="rq" class="big" rows="4" placeholder="e.g., How do transportation barriers influence missed prenatal appointments among low-income patients?"></textarea>
+    <textarea id="rq" rows="4" placeholder="e.g., How do transportation barriers influence missed prenatal appointments among low-income patients?"></textarea>
+    <div class="toolbar">
+      <button class="btn primary" id="step1Next">Next</button>
+    </div>
   </section>
 
-  <!-- 1) Types reference -->
-  <section class="panel">
+  <!-- Step 2: Types reference -->
+  <section class="panel hidden" id="step2">
     <div class="kicker">Step 1</div>
     <h2>Types of Interview Questions (reference)</h2>
     <p class="hint">Skim this before drafting. Prefer open-ended & probing; avoid leading & double-barreled.</p>
@@ -81,19 +83,27 @@
         <tr><td>Hypothetical</td><td>Imagined scenario.</td><td>“If the clinic moved farther, how would you handle visits?”</td><td>Use cautiously</td></tr>
       </tbody>
     </table>
+    <div class="toolbar">
+      <button class="btn" id="step2Prev">Back</button>
+      <button class="btn primary" id="step2Next">Next</button>
+    </div>
   </section>
 
-  <!-- 3) Focus -->
-  <section class="panel soft">
+  <!-- Step 3: Focus -->
+  <section class="panel soft hidden" id="step3">
     <div class="kicker">Step 2</div>
     <h2>Choose a Focus</h2>
     <p class="hint">Select ONE lens so your question is tight and aligned with your RQ.</p>
     <div id="focusChips" class="chips" role="tablist" aria-label="Focus"></div>
     <p class="tiny muted" style="margin-top:.5rem">Options: Background/Context · Experience · Impact · Barriers · Supports · Solutions/Recommendations</p>
+    <div class="toolbar">
+      <button class="btn" id="step3Prev">Back</button>
+      <button class="btn primary" id="step3Next">Next</button>
+    </div>
   </section>
 
-  <!-- 4) Role -->
-  <section class="panel">
+  <!-- Step 4: Role -->
+  <section class="panel hidden" id="step4">
     <div class="kicker">Step 3</div>
     <h2>Identify the Question Role</h2>
     <p class="hint">Pick one. We’ll show a definition and an example.</p>
@@ -104,49 +114,53 @@
       <div class="kicker" style="margin-top:10px">Example</div>
       <div id="roleEx" style="font-weight:600; margin-top:4px">—</div>
     </div>
+    <div class="toolbar">
+      <button class="btn" id="step4Prev">Back</button>
+      <button class="btn primary" id="step4Next">Next</button>
+    </div>
   </section>
 
-  <!-- 5) Stems + draft -->
-  <section class="panel soft">
+  <!-- Step 5: Stems + draft -->
+  <section class="panel soft hidden" id="step5">
     <div class="kicker">Step 4</div>
     <h2>Pick a Stem → See an Example → Write Your Interview Question</h2>
     <p class="hint">Click a stem (or type your own). Then rewrite the example as a single, neutral, open-ended prompt.</p>
-
     <div class="tiny">Stem (click to select)</div>
     <div id="stemChips" class="chips" aria-label="Stem choices"></div>
     <div style="height:8px"></div>
     <input id="stem" type="text" class="big" placeholder="e.g., In what ways…">
-
     <div style="height:12px"></div>
     <div class="exbox">
       <div class="kicker">Auto-example (based on your stem)</div>
       <div id="stemExample" style="font-weight:600; margin-top:4px;">In what ways does ____ affect ____?</div>
     </div>
-
-    <div style="height:8px"></div>
     <label class="tiny" for="question">Your research interview question (rewrite in your own words)</label>
     <textarea id="question" class="big" rows="4" placeholder="Type your final interview question here…"></textarea>
-
-    <div style="height:8px"></div>
     <label class="tiny" for="follow">Optional follow-up (for short answers)</label>
     <textarea id="follow" class="big" rows="2" placeholder="e.g., Can you give a specific example? / What happened next? / How did that affect you?"></textarea>
+    <div class="toolbar">
+      <button class="btn" id="step5Prev">Back</button>
+      <button class="btn primary" id="step5Next">Next</button>
+    </div>
   </section>
 
-  <!-- Preview -->
-  <section class="panel">
+  <!-- Step 6: Preview -->
+  <section class="panel hidden" id="step6">
     <div class="kicker">Step 5</div>
     <h2>Your Selections & Live Preview</h2>
     <div class="summary tiny" id="selectionsBox" style="white-space:pre-wrap"></div>
     <div class="exbox" id="previewBox" style="white-space:pre-wrap; margin-top:10px"></div>
     <div class="toolbar">
+      <button class="btn" id="step6Prev">Back</button>
+      <button class="btn primary" id="step6Next">Next</button>
       <button class="btn primary" id="copyBtn">Copy</button>
       <button class="btn" onclick="window.print()">Print</button>
       <button class="btn" id="resetBtn">Reset</button>
     </div>
   </section>
 
-  <!-- 6) Quality check -->
-  <section class="panel soft">
+  <!-- Step 7: Quality check -->
+  <section class="panel soft hidden" id="step7">
     <div class="kicker">Step 6</div>
     <h2>Quality Check (typed reflection; optional checkboxes)</h2>
     <p class="hint">Write 1 sentence for each item (and optionally tick the box).</p>
@@ -172,9 +186,21 @@
         <textarea id="r_detail" class="big" rows="3" placeholder="How does it elicit stories, sequences, or examples?"></textarea>
       </div>
     </div>
+    <div class="toolbar">
+      <button class="btn" id="step7Prev">Back</button>
+      <button class="btn primary" id="step7Next">Finish</button>
+    </div>
   </section>
 
-  <p class="muted tiny" style="text-align:center; margin-top:10px">Drafts are saved locally in this browser.</p>
+  <!-- Step 8: Done -->
+  <section class="panel soft hidden" id="step8">
+    <h2>All Done!</h2>
+    <div class="exbox" id="finalPreview" style="white-space:pre-wrap"></div>
+    <div class="toolbar">
+      <button class="btn primary" id="restartBtn">Start Over</button>
+    </div>
+    <p class="muted tiny" style="text-align:center; margin-top:10px">Drafts are saved locally in this browser.</p>
+  </section>
 </div>
 
 <script>
@@ -188,7 +214,6 @@
     { id:"supports", label:"Supports" },
     { id:"solutions", label:"Solutions / Recommendations" }
   ];
-
   const ROLES = [
     { id:"intro",   label:"Introductory", def:"Warm-up to ease into the topic and establish context.",
       ex:"Can you tell me about alcohol use among your peers?" },
@@ -199,7 +224,6 @@
     { id:"closing", label:"Closing", def:"Invites reflection, advice, or takeaway at the end.",
       ex:"What advice would you give a friend about alcohol and mental health?" }
   ];
-
   const STEMS = [
     "How do you…",
     "What happens when…",
@@ -209,7 +233,6 @@
     "What would you change about…",
     "What matters most to you about…"
   ];
-
   const STEM_PATTERNS = {
     "How do you…": "How do you ____ when ____?",
     "What happens when…": "What happens when ____? Can you give an example?",
@@ -222,7 +245,13 @@
 
   // ----- Elements -----
   const $ = (id)=>document.getElementById(id);
-  const rq = $("rq");
+  const statusMsg = $("statusMessage");
+  const steps = [1,2,3,4,5,6,7,8].map(i => $("step"+i));
+  let currentStep = 1;
+
+  // ----- Chips -----
+  let selectedFocus = null;
+  let selectedRole = null;
   const focusChips = $("focusChips");
   const roleChips = $("roleChips");
   const roleLabel = $("roleLabel");
@@ -231,19 +260,7 @@
   const stemChips = $("stemChips");
   const stem = $("stem");
   const stemExample = $("stemExample");
-  const question = $("question");
-  const follow = $("follow");
-  const selectionsBox = $("selectionsBox");
-  const preview = $("previewBox");
 
-  const qIds = ["r_ties","r_open","r_neutral","r_clear","r_detail","c_ties","c_open","c_neutral","c_clear","c_detail"];
-  const qEls = Object.fromEntries(qIds.map(id=>[id,$(id)]));
-
-  // ----- State -----
-  let selectedFocus = null;
-  let selectedRole = null;
-
-  // Build chips
   FOCUS.forEach(f=>{
     const btn = document.createElement("button");
     btn.className="chip"; btn.type="button"; btn.setAttribute("aria-pressed","false");
@@ -254,7 +271,6 @@
     };
     focusChips.appendChild(btn);
   });
-
   ROLES.forEach(r=>{
     const btn = document.createElement("button");
     btn.className="chip"; btn.type="button"; btn.setAttribute("aria-pressed","false");
@@ -267,7 +283,6 @@
     };
     roleChips.appendChild(btn);
   });
-
   STEMS.forEach(s=>{
     const btn = document.createElement("button");
     btn.className="chip"; btn.type="button"; btn.setAttribute("aria-pressed","false");
@@ -279,12 +294,42 @@
     stemChips.appendChild(btn);
   });
 
-  // Render helpers
+  // ----- Navigation -----
+  function goToStep(num) {
+    steps.forEach((el,i) => el.classList.toggle("hidden", (i+1)!==num));
+    currentStep = num;
+    window.scrollTo({top:0,behavior:"smooth"});
+    postHeight();
+  }
+  $("step1Next").onclick = ()=> goToStep(2);
+  $("step2Prev").onclick = ()=> goToStep(1);
+  $("step2Next").onclick = ()=> goToStep(3);
+  $("step3Prev").onclick = ()=> goToStep(2);
+  $("step3Next").onclick = ()=> goToStep(4);
+  $("step4Prev").onclick = ()=> goToStep(3);
+  $("step4Next").onclick = ()=> goToStep(5);
+  $("step5Prev").onclick = ()=> goToStep(4);
+  $("step5Next").onclick = ()=> goToStep(6);
+  $("step6Prev").onclick = ()=> goToStep(5);
+  $("step6Next").onclick = ()=> { goToStep(7); render(); };
+  $("step7Prev").onclick = ()=> goToStep(6);
+  $("step7Next").onclick = ()=> { showFinal(); goToStep(8); };
+  $("restartBtn").onclick = ()=> { $("resetBtn").onclick(); goToStep(1); };
+
+  // ----- Render -----
+  const rq = $("rq");
+  const question = $("question");
+  const follow = $("follow");
+  const selectionsBox = $("selectionsBox");
+  const preview = $("previewBox");
+  const finalPreview = $("finalPreview");
+  const qIds = ["r_ties","r_open","r_neutral","r_clear","r_detail","c_ties","c_open","c_neutral","c_clear","c_detail"];
+  const qEls = Object.fromEntries(qIds.map(id=>[id,$(id)]));
+
   function buildExample(){
     const s=(stem.value||"").trim();
     stemExample.textContent = STEM_PATTERNS[s] || (s ? s+" …" : "In what ways does ____ affect ____?");
   }
-
   function buildSelections(){
     const lines=[];
     lines.push("Your selections");
@@ -294,7 +339,6 @@
     lines.push("• Stem: " + ((stem.value||"").trim() || "—"));
     selectionsBox.textContent = lines.join("\n");
   }
-
   function buildPreview(){
     const lines=[];
     lines.push("Research Question (RQ): " + (rq.value.trim() || "—"));
@@ -309,10 +353,10 @@
     lines.push("• Invites detail: " + (qEls.r_detail.value.trim() || "—"));
     preview.textContent = lines.join("\n");
   }
-
   function render(){ buildExample(); buildSelections(); buildPreview(); postHeight(); }
+  function showFinal(){ finalPreview.textContent = preview.textContent; }
 
-  // Copy / Reset
+  // ----- Buttons -----
   $("copyBtn").onclick = async ()=>{
     try{ await navigator.clipboard.writeText(preview.textContent); alert("Copied to clipboard."); }
     catch{ window.prompt("Copy the text below:", preview.textContent); }
@@ -325,10 +369,10 @@
       .forEach(b=>b.setAttribute("aria-pressed","false"));
     roleLabel.textContent="—"; roleDef.textContent="Select a role to see its purpose."; roleEx.textContent="—";
     Object.values(qEls).forEach(el=>{ if(el.type==="checkbox") el.checked=false; else el.value=""; });
-    save(); render();
+    save(); render(); goToStep(1);
   };
 
-  // Local autosave
+  // ----- Autosave -----
   const KEY="research-iq-builder-v1";
   function save(){
     const s={ rq:rq.value, stem:stem.value, question:question.value, follow:follow.value,
@@ -354,14 +398,12 @@
       }
     }catch(e){}
   }
-
   document.addEventListener("input", ()=>{ save(); render(); });
   document.addEventListener("change", ()=>{ save(); render(); });
-
-  // Init
   load(); render();
+  goToStep(1);
 
-  // Iframe auto-height messaging (optional; harmless if standalone)
+  // Iframe auto-height messaging (for Canvas)
   function postHeight(){
     if(!window.parent || window.parent===window) return;
     const h=document.documentElement.scrollHeight;
