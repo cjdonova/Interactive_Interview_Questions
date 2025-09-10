@@ -53,15 +53,14 @@
   <!-- Intro -->
   <header class="panel soft">
     <h1>Public Health Research Interview Question Builder</h1>
-    <p class="muted">This tool guides you in constructing a clear, neutral, open-ended <strong>qualitative research interview question</strong> for public health. You’ll pick a <em>focus</em>, a <em>question role</em>, a <em>stem</em>, draft your question, and finish with a <em>quality check</em>. You can also add a follow-up to deepen short or vague answers.</p>
-    <p class="hint" style="margin-top:.5rem">This is for qualitative interviews (not surveys/job interviews). Use for research with participants in public health or social sciences.</p>
+    <p class="muted">This tool helps you develop a clear, neutral, open-ended <strong>public health research</strong> interview question. You’ll pick a <em>focus</em>, choose a <em>question role</em>, select a <em>stem</em>, draft your question, and finish with a <em>quality check</em>. You can also add a follow-up to deepen short or vague answers.</p>
   </header>
 
   <!-- Step 1: Types reference -->
   <section class="panel" id="step1">
     <div class="kicker">Step 1</div>
-    <h2>Types of Research Interview Questions</h2>
-    <p class="hint">Use this guide before drafting. Prefer open-ended and probing; avoid leading & double-barreled prompts. All examples are public health interview questions.</p>
+    <h2>Types of Interview Questions (public health reference)</h2>
+    <p class="hint">Use this guide before drafting. Prefer open-ended and probing; avoid leading & double-barreled prompts.</p>
     <table aria-label="Types of interview questions">
       <thead>
         <tr><th>Type</th><th>Description</th><th>Public health example</th><th>Use</th></tr>
@@ -85,9 +84,9 @@
   <section class="panel soft" id="step2" style="display:none;">
     <div class="kicker">Step 2</div>
     <h2>Your Public Health Topic & Choose a Focus</h2>
-    <p class="hint">Describe your research topic or question in 1–2 sentences, then select ONE focus lens. This helps narrow your interview question.</p>
+    <p class="hint">Anchor your scope (1–2 sentences), then select ONE focus lens.</p>
     <label class="label tiny" for="topic">Public health topic or guiding research question <span id="topicReq" style="color:#dc2626;display:none;">(required)</span></label>
-    <textarea id="topic" rows="3" placeholder="e.g., Barriers to accessing campus mental health services for first-generation students"></textarea>
+    <textarea id="topic" rows="3" placeholder="e.g., Access to campus mental health services for first-generation students"></textarea>
     <div style="height:8px"></div>
     <div class="label tiny">Focus (choose one) <span id="focusReq" style="color:#dc2626;display:none;">(required)</span></div>
     <div id="focusChips" class="chips" role="tablist" aria-label="Focus"></div>
@@ -101,7 +100,7 @@
   <!-- Step 3: Question role -->
   <section class="panel" id="step3" style="display:none;">
     <div class="kicker">Step 3</div>
-    <h2>Identify Your Interview Question Role</h2>
+    <h2>Identify Your Question Role</h2>
     <p class="hint">Pick one. The definition and a public-health example will appear below.</p>
     <div id="roleChips" class="chips" role="tablist" aria-label="Question role"></div>
     <div class="summary" style="margin-top:10px">
@@ -120,8 +119,8 @@
   <!-- Step 4: Stem + auto-example + rewrite -->
   <section class="panel soft" id="step4" style="display:none;">
     <div class="kicker">Step 4</div>
-    <h2>Pick a Stem → See an Example → Write Your Interview Question</h2>
-    <p class="hint">Click a stem, add your own, then rewrite the example as your final, single-focus, neutral research interview question.</p>
+    <h2>Pick a Stem → See an Example → Write Your Question</h2>
+    <p class="hint">Click a stem, add your own, then rewrite the example as your final, single-focus, neutral question.</p>
     <div class="label tiny">Stem (click to select or type your own) <span id="stemReq" style="color:#dc2626;display:none;">(required)</span></div>
     <div id="stemChips" class="chips" aria-label="Stem choices"></div>
     <input id="stem" type="text" placeholder="e.g., In what ways…" aria-label="Stem" autocomplete="off">
@@ -130,8 +129,8 @@
       <div class="kicker">Auto-example (based on your stem)</div>
       <div id="stemExample" style="font-weight:600; margin-top:4px;">In what ways does ____ affect ____?</div>
     </div>
-    <label class="label tiny" for="rewrite">Your research interview question (rewrite the example in your own words) <span id="rewriteReq" style="color:#dc2626;display:none;">(required)</span></label>
-    <input id="rewrite" type="text" placeholder="Type your final public-health research interview question here…" aria-label="Final interview question">
+    <label class="label tiny" for="rewrite">Your question (rewrite the example in your own words) <span id="rewriteReq" style="color:#dc2626;display:none;">(required)</span></label>
+    <input id="rewrite" type="text" placeholder="Type your final public-health interview question here…" aria-label="Final interview question">
     <label class="label tiny" for="follow">Optional follow-up (to deepen short answers)</label>
     <input id="follow" type="text" placeholder="e.g., Can you give a specific example? / What happened next? / How did that affect you?">
     <div class="toolbar">
@@ -211,6 +210,7 @@
     </p>
   </section>
 </div>
+
 <script>
 (function(){
   // ---- Data ----
