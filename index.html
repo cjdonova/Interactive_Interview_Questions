@@ -17,19 +17,30 @@
   .hint{color:#64748b;margin:.25rem 0 .5rem}
   textarea,input[type=text]{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px}
   textarea{resize:vertical}
+  textarea.big,input[type=text].big{font-size:1.14rem;min-height:90px;}
   .chips{display:flex;flex-wrap:wrap;gap:8px}
   .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:8px 12px;font-size:.92rem;cursor:pointer}
   .chip[aria-pressed="true"]{background:#0f172a;color:#fff;border-color:#0f172a}
+  .chip:focus{outline:2px solid #2acaea}
   .summary,.exbox{border:1px dashed #cbd5e1;background:#fff;border-radius:12px;padding:12px}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .btn{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:10px 12px;font-size:.95rem;cursor:pointer}
   .btn.primary{background:#0f172a;color:#fff;border-color:#0f172a}
+  .btn:focus{outline:2px solid #2acaea}
   .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
   .kicker{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
   table{width:100%;border-collapse:collapse;font-size:.95rem}
   th,td{border:1px solid #e2e8f0;padding:8px;text-align:left;vertical-align:top}
   thead th{background:#f1f5f9}
   .tiny{font-size:.86rem}
+  @media (max-width:600px){
+    .wrap{padding:0 4px}
+    .panel,.soft{padding:8px}
+    .chips{gap:4px}
+    .btn{padding:10px 6px;font-size:.95rem}
+    .row{grid-template-columns:1fr}
+    textarea.big,input[type=text].big{font-size:1.03rem;min-height:76px;}
+  }
 </style>
 </head>
 <body>
@@ -48,7 +59,7 @@
     <div class="kicker">Start here</div>
     <h2>Your Research Question (RQ)</h2>
     <p class="hint">Type the RQ guiding your interview. Your interview question must help generate evidence toward this RQ.</p>
-    <textarea id="rq" rows="3" placeholder="e.g., How do transportation barriers influence missed prenatal appointments among low-income patients?"></textarea>
+    <textarea id="rq" class="big" rows="4" placeholder="e.g., How do transportation barriers influence missed prenatal appointments among low-income patients?"></textarea>
   </section>
 
   <!-- 1) Types reference -->
@@ -104,7 +115,7 @@
     <div class="tiny">Stem (click to select)</div>
     <div id="stemChips" class="chips" aria-label="Stem choices"></div>
     <div style="height:8px"></div>
-    <input id="stem" type="text" placeholder="e.g., In what ways…">
+    <input id="stem" type="text" class="big" placeholder="e.g., In what ways…">
 
     <div style="height:12px"></div>
     <div class="exbox">
@@ -114,11 +125,11 @@
 
     <div style="height:8px"></div>
     <label class="tiny" for="question">Your research interview question (rewrite in your own words)</label>
-    <input id="question" type="text" placeholder="Type your final interview question here…">
+    <textarea id="question" class="big" rows="4" placeholder="Type your final interview question here…"></textarea>
 
     <div style="height:8px"></div>
     <label class="tiny" for="follow">Optional follow-up (for short answers)</label>
-    <input id="follow" type="text" placeholder="e.g., Can you give a specific example? / What happened next? / How did that affect you?">
+    <textarea id="follow" class="big" rows="2" placeholder="e.g., Can you give a specific example? / What happened next? / How did that affect you?"></textarea>
   </section>
 
   <!-- Preview -->
@@ -142,23 +153,23 @@
     <div class="row">
       <div>
         <label class="tiny"><input type="checkbox" id="c_ties"> Tied to RQ & focus</label>
-        <textarea id="r_ties" rows="2" placeholder="How does this prompt generate evidence for your RQ?"></textarea>
+        <textarea id="r_ties" class="big" rows="3" placeholder="How does this prompt generate evidence for your RQ?"></textarea>
       </div>
       <div>
         <label class="tiny"><input type="checkbox" id="c_open"> Open-ended</label>
-        <textarea id="r_open" rows="2" placeholder="Why can’t this be answered with yes/no?"></textarea>
+        <textarea id="r_open" class="big" rows="3" placeholder="Why can’t this be answered with yes/no?"></textarea>
       </div>
       <div>
         <label class="tiny"><input type="checkbox" id="c_neutral"> Neutral</label>
-        <textarea id="r_neutral" rows="2" placeholder="What assumptions did you remove? Any loaded words?"></textarea>
+        <textarea id="r_neutral" class="big" rows="3" placeholder="What assumptions did you remove? Any loaded words?"></textarea>
       </div>
       <div>
         <label class="tiny"><input type="checkbox" id="c_clear"> Clear wording</label>
-        <textarea id="r_clear" rows="2" placeholder="Which jargon/acronyms did you avoid or explain?"></textarea>
+        <textarea id="r_clear" class="big" rows="3" placeholder="Which jargon/acronyms did you avoid or explain?"></textarea>
       </div>
       <div>
         <label class="tiny"><input type="checkbox" id="c_detail"> Invites detail</label>
-        <textarea id="r_detail" rows="2" placeholder="How does it elicit stories, sequences, or examples?"></textarea>
+        <textarea id="r_detail" class="big" rows="3" placeholder="How does it elicit stories, sequences, or examples?"></textarea>
       </div>
     </div>
   </section>
