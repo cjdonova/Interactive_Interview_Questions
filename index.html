@@ -1,78 +1,563 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Research Interview Question Builder (Step by Step)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  .hidden { display: none !important; }
-  body { font-family: system-ui, sans-serif; background: #f6f6f9; }
-  .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 24px auto; max-width: 700px; }
-  textarea, input[type=text] { width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; font-size: 1.14rem; min-height: 90px; margin-bottom: 14px; }
-  .toolbar { margin-top: 16px; display: flex; gap: 8px; justify-content: center; }
-  .btn { border: 1px solid #cbd5e1; background: #fff; border-radius: 10px; padding: 14px 26px; font-size: 1.05rem; cursor: pointer; font-weight: 600; }
-  .btn.primary { background: #0f172a; color: #fff; border-color: #0f172a; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Health Interview Question Builder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.7;
+            font-size: 18px;
+            font-weight: 300;
+        }
+        .container {
+            max-width: 580px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .header { padding: 80px 0; text-align: center; }
+        .header h1 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 16px;
+        }
+        .header p {
+            font-size: 18px;
+            color: #666;
+            font-weight: 600;
+        }
+        .progress {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .progress-line {
+            width: 80px;
+            height: 2px;
+            background: #f0f0f0;
+            margin: 0 auto 16px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #2acaea;
+            width: 16.6%;
+            transition: width 0.3s ease;
+        }
+        .step-num { font-size: 14px; color: #999; }
+        .content { padding: 60px 0 100px; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .step-title {
+            font-size: 32px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 60px;
+            color: #000;
+        }
+        .section { margin: 60px 0; }
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #000;
+        }
+        p { margin-bottom: 20px; color: #666; }
+
+        .card, .choice-card {
+            border: 1px solid #eee;
+            padding: 24px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #000;
+            border-radius: 8px;
+        }
+        .card h4, .choice-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #000;
+        }
+        .card p, .choice-card p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+        .card.selected, .choice-card.selected {
+            border-color: #4fc14f;
+            background: #f0fff0;
+            box-shadow: 0 4px 12px rgba(79, 193, 79, 0.2);
+        }
+        .card.selected h4, .choice-card.selected h4 {
+            color: #2d5016;
+        }
+        .form-group { margin-bottom: 40px; }
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #000;
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            padding: 16px 0;
+            font-size: 18px;
+            background: transparent;
+            transition: border-color 0.2s;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        input:focus, textarea:focus { outline: none; border-bottom-color: #2acaea; }
+        .hint { font-size: 12px; color: #999; margin-top: 8px; }
+        .feedback {
+            margin-top: 16px;
+            padding: 16px;
+            border-left: 2px solid #ddd;
+            font-size: 14px;
+            display: none;
+            color: #000;
+        }
+        .feedback.show { display: block; }
+        .example {
+            margin: 40px 0;
+            padding: 20px;
+            border-left: 2px solid #2acaea;
+            background: white;
+        }
+        .example h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #000; }
+        .btn-group { text-align: center; margin-top: 60px; }
+        .btn, .btn-primary {
+            background: #cc0002;
+            color: white;
+            border: none;
+            display: inline-block;
+            padding: 16px 32px;
+            margin: 0 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn:hover, .btn-primary:hover {
+            background: #dd6263;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn-previous {
+            background: #2acaea !important;
+            color: #fff !important;
+        }
+        .btn-previous:hover, .btn-previous:focus {
+            background: #7be9f4 !important;
+            color: #fff !important;
+        }
+        .btn-action {
+            background: #000 !important;
+            color: white !important;
+        }
+        .btn-action:hover {
+            background: #4fc14f !important;
+            color: white !important;
+        }
+        .result {
+            margin-top: 32px;
+            padding: 20px;
+            border-left: 2px solid #ffd700;
+            background: white;
+        }
+        .final {
+            text-align: center;
+            margin: 80px 0;
+            padding: 40px;
+            border: 1px solid #2acaea;
+            background: white;
+        }
+        .final h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        /* Step-specific adjustments */
+        .role-card {
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .role-card.selected {
+            background: #f0fff0;
+            border-color: #4fc14f;
+        }
+        .role-card h4 { margin-bottom: 8px; }
+        .role-def { font-size: 14px; color: #666; margin-bottom: 6px; }
+        .role-ex { font-size: 14px; color: #000; font-weight: 600; }
+        .quality-row { display: flex; flex-direction: column; gap: 24px; }
+        @media (max-width: 600px) {
+            .container { padding: 0 12px; }
+            .header h1 { font-size: 28px; }
+            .step-title { font-size: 22px; }
+            .btn { padding: 12px 20px; font-size: 15px; margin: 0 6px; }
+        }
+    </style>
 </head>
 <body>
-<div>
-  <!-- Step 1 -->
-  <section id="step1" class="panel">
-    <h2>Step 1: Your Research Question (RQ)</h2>
-    <textarea id="rq" rows="4" placeholder="Type your research question here..."></textarea>
-    <div class="toolbar">
-      <button class="btn primary" id="step1Next">Next</button>
+    <div class="container">
+        <div class="header">
+            <h1>Interview Question Builder</h1>
+            <p>Develop a strong, open-ended research interview question for public health</p>
+        </div>
+        <div class="progress">
+            <div class="progress-line">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <div class="step-num">Step <span id="stepNum">1</span> of 7</div>
+        </div>
+        <div class="content">
+            <!-- Step 1: Research Question -->
+            <div class="step active" id="step1">
+                <h2 class="step-title">Your Research Question (RQ)</h2>
+                <div class="section">
+                    <h3>Start with your study's guiding research question</h3>
+                    <p class="hint">Your interview question should generate evidence for this RQ.</p>
+                    <textarea id="rq" rows="4" placeholder="e.g., How do transportation barriers influence missed prenatal appointments among low-income patients?"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+            <!-- Step 2: Types reference -->
+            <div class="step" id="step2">
+                <h2 class="step-title">Types of Interview Questions</h2>
+                <div class="section">
+                    <h3>Prefer open-ended & probing (not leading, closed, or double-barreled)</h3>
+                    <div class="card" onclick="selectType(this,'open-ended')">
+                        <h4>Open-ended</h4>
+                        <p>Invites depth/story; “how/what/in what ways”. <br>
+                        <em>Can you describe how access to transportation affects getting to clinic appointments?</em></p>
+                    </div>
+                    <div class="card" onclick="selectType(this,'probing')">
+                        <h4>Probing</h4>
+                        <p>Follow-up for more detail.<br>
+                        <em>Can you say more about that? What happened next?</em></p>
+                    </div>
+                    <div class="card" onclick="selectType(this,'demographic')">
+                        <h4>Demographic</h4>
+                        <p>Brief background context.<br>
+                        <em>How would you describe your housing situation?</em></p>
+                    </div>
+                    <div class="card" onclick="selectType(this,'closed')">
+                        <h4>Closed</h4>
+                        <p>Yes/No or short choice.<br>
+                        <em>Do you have health insurance?</em></p>
+                    </div>
+                    <div class="card" onclick="selectType(this,'leading')">
+                        <h4>Leading</h4>
+                        <p>Suggests a “right” answer.<br>
+                        <em>Wouldn’t you agree that vaping is obviously harmful?</em></p>
+                    </div>
+                    <div class="card" onclick="selectType(this,'double-barreled')">
+                        <h4>Double-barreled</h4>
+                        <p>Asks two things at once.<br>
+                        <em>How do cost <em>and</em> transport affect appointments?</em></p>
+                    </div>
+                    <div class="card" onclick="selectType(this,'hypothetical')">
+                        <h4>Hypothetical</h4>
+                        <p>Imagined scenario.<br>
+                        <em>If the clinic moved farther, how would you handle visits?</em></p>
+                    </div>
+                    <div id="typeFeedback" class="feedback"></div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+            <!-- Step 3: Focus -->
+            <div class="step" id="step3">
+                <h2 class="step-title">Choose Your Focus</h2>
+                <div class="section">
+                    <h3>Select one lens for your interview question</h3>
+                    <div class="choice-card" onclick="selectFocus(this,'Background/Context')"><h4>Background/Context</h4></div>
+                    <div class="choice-card" onclick="selectFocus(this,'Experience')"><h4>Experience</h4></div>
+                    <div class="choice-card" onclick="selectFocus(this,'Impact')"><h4>Impact</h4></div>
+                    <div class="choice-card" onclick="selectFocus(this,'Barriers')"><h4>Barriers</h4></div>
+                    <div class="choice-card" onclick="selectFocus(this,'Supports')"><h4>Supports</h4></div>
+                    <div class="choice-card" onclick="selectFocus(this,'Solutions/Recommendations')"><h4>Solutions/Recommendations</h4></div>
+                    <div id="focusFeedback" class="feedback"></div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+            <!-- Step 4: Question Role -->
+            <div class="step" id="step4">
+                <h2 class="step-title">Identify the Question Role</h2>
+                <div class="section">
+                    <h3>Pick one—definition and example will show below</h3>
+                    <div class="role-card" onclick="selectRole(this,'Introductory','Warm-up to ease into the topic and establish context.','Can you tell me about alcohol use among your peers?')">
+                        <h4>Introductory</h4>
+                        <div class="role-def">Warm-up to ease into the topic and establish context.</div>
+                        <div class="role-ex">Can you tell me about alcohol use among your peers?</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this,'Core','Heart of the research; targets your main concept.','How do you think alcohol affects stress?')">
+                        <h4>Core</h4>
+                        <div class="role-def">Heart of the research; targets your main concept.</div>
+                        <div class="role-ex">How do you think alcohol affects stress?</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this,'Follow-Up','Adds depth or clarification after a short/unclear answer.','Can you give an example?')">
+                        <h4>Follow-Up</h4>
+                        <div class="role-def">Adds depth or clarification after a short/unclear answer.</div>
+                        <div class="role-ex">Can you give an example?</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this,'Closing','Invites reflection, advice, or takeaway at the end.','What advice would you give a friend about alcohol and mental health?')">
+                        <h4>Closing</h4>
+                        <div class="role-def">Invites reflection, advice, or takeaway at the end.</div>
+                        <div class="role-ex">What advice would you give a friend about alcohol and mental health?</div>
+                    </div>
+                    <div id="roleFeedback" class="feedback"></div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+            <!-- Step 5: Stem + Draft -->
+            <div class="step" id="step5">
+                <h2 class="step-title">Pick a Stem & Write Your Interview Question</h2>
+                <div class="section">
+                    <h3>Stem (choose one or type your own)</h3>
+                    <div class="choice-card" onclick="selectStem(this,'How do you…')"><h4>How do you…</h4></div>
+                    <div class="choice-card" onclick="selectStem(this,'What happens when…')"><h4>What happens when…</h4></div>
+                    <div class="choice-card" onclick="selectStem(this,'In what ways…')"><h4>In what ways…</h4></div>
+                    <div class="choice-card" onclick="selectStem(this,'Can you walk me through…')"><h4>Can you walk me through…</h4></div>
+                    <div class="choice-card" onclick="selectStem(this,'Tell me about a time when…')"><h4>Tell me about a time when…</h4></div>
+                    <div class="choice-card" onclick="selectStem(this,'What would you change about…')"><h4>What would you change about…</h4></div>
+                    <div class="choice-card" onclick="selectStem(this,'What matters most to you about…')"><h4>What matters most to you about…</h4></div>
+                    <div class="form-group">
+                        <label>Or enter your own stem</label>
+                        <input type="text" id="customStem" placeholder="Type your own stem here" oninput="setCustomStem(this)">
+                    </div>
+                    <div class="example" id="stemExampleBox" style="display:none;">
+                        <h4>Stem Example</h4>
+                        <div id="stemExample"></div>
+                    </div>
+                    <div id="stemFeedback" class="feedback"></div>
+                </div>
+                <div class="section">
+                    <div class="form-group">
+                        <label>Your interview question</label>
+                        <textarea id="interviewQuestion" rows="4" placeholder="Type your full interview question here"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Optional follow-up (for short answers)</label>
+                        <textarea id="followup" rows="2" placeholder="e.g., Can you give a specific example? What happened next? How did that affect you?"></textarea>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+            <!-- Step 6: Quality Check -->
+            <div class="step" id="step6">
+                <h2 class="step-title">Quality Check</h2>
+                <div class="section quality-row">
+                    <div class="form-group">
+                        <label>Tied to RQ & focus</label>
+                        <textarea rows="3" id="q_tied" placeholder="How does this prompt generate evidence for your RQ?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Open-ended</label>
+                        <textarea rows="3" id="q_open" placeholder="Why can't this be answered with yes/no?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Neutral</label>
+                        <textarea rows="3" id="q_neutral" placeholder="What assumptions did you remove? Any loaded words?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Clear wording</label>
+                        <textarea rows="3" id="q_clear" placeholder="Which jargon/acronyms did you avoid or explain?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Invites detail</label>
+                        <textarea rows="3" id="q_detail" placeholder="How does it elicit stories, sequences, or examples?"></textarea>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Finish</button>
+                </div>
+            </div>
+            <!-- Step 7: Done -->
+            <div class="step" id="step7">
+                <h2 class="step-title">Congratulations!</h2>
+                <div class="final">
+                    <h3>Your Interview Question</h3>
+                    <div style="margin: 20px 0; padding: 16px; border-left: 2px solid #2acaea;">
+                        <strong>Final Interview Question:</strong><br>
+                        <span id="finalQ">Your question will appear here...</span>
+                    </div>
+                    <div style="margin:20px 0;">
+                        <strong>Follow-up:</strong>
+                        <span id="finalF">None added</span>
+                    </div>
+                    <div style="margin:20px 0;">
+                        <strong>Quality Reflection:</strong>
+                        <ul style="text-align:left;margin:0 auto;max-width:440px;">
+                            <li><strong>Tied to RQ & focus:</strong> <span id="finalTied"></span></li>
+                            <li><strong>Open-ended:</strong> <span id="finalOpen"></span></li>
+                            <li><strong>Neutral:</strong> <span id="finalNeutral"></span></li>
+                            <li><strong>Clear wording:</strong> <span id="finalClear"></span></li>
+                            <li><strong>Invites detail:</strong> <span id="finalDetail"></span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-previous" onclick="prevStep()">Previous</button>
+                    <button class="btn" onclick="restart()">Start Over</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </section>
-  <!-- Step 2 -->
-  <section id="step2" class="panel hidden">
-    <h2>Step 2: Types of Interview Questions</h2>
-    <p>...your table and content...</p>
-    <div class="toolbar">
-      <button class="btn" id="step2Prev">Back</button>
-      <button class="btn primary" id="step2Next">Next</button>
-    </div>
-  </section>
-  <!-- Step 3 -->
-  <section id="step3" class="panel hidden">
-    <h2>Step 3: Choose a Focus</h2>
-    <p>...your chips/buttons...</p>
-    <div class="toolbar">
-      <button class="btn" id="step3Prev">Back</button>
-      <button class="btn primary" id="step3Next">Next</button>
-    </div>
-  </section>
-  <!-- Step 4 -->
-  <section id="step4" class="panel hidden">
-    <h2>Step 4: Draft Your Interview Question</h2>
-    <textarea rows="4" placeholder="Type your interview question here..."></textarea>
-    <div class="toolbar">
-      <button class="btn" id="step4Prev">Back</button>
-      <button class="btn primary" id="step4Next">Next</button>
-    </div>
-  </section>
-  <!-- ... repeat for all steps ... -->
-</div>
-<script>
-function goToStep(num) {
-  for (let i = 1; i <= 4; i++) {
-    const el = document.getElementById('step' + i);
-    if (el) {
-      el.classList.toggle('hidden', i !== num);
-    }
-  }
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-document.getElementById('step1Next').onclick = () => goToStep(2);
-document.getElementById('step2Prev').onclick = () => goToStep(1);
-document.getElementById('step2Next').onclick = () => goToStep(3);
-document.getElementById('step3Prev').onclick = () => goToStep(2);
-document.getElementById('step3Next').onclick = () => goToStep(4);
-document.getElementById('step4Prev').onclick = () => goToStep(3);
-document.getElementById('step4Next').onclick = () => goToStep(1); // or next step
-document.addEventListener('DOMContentLoaded', function() {
-  goToStep(1);
-});
-</script>
+    <script>
+        let currentStep = 1;
+        let selectedType = '';
+        let selectedFocus = '';
+        let selectedRole = '';
+        let roleDef = '';
+        let roleEx = '';
+        let selectedStem = '';
+        let stemExamples = {
+            "How do you…": "How do you ____ when ____?",
+            "What happens when…": "What happens when ____? Can you give an example?",
+            "In what ways…": "In what ways does ____ affect ____?",
+            "Can you walk me through…": "Can you walk me through ____ from start to finish?",
+            "Tell me about a time when…": "Tell me about a time when ____. What happened?",
+            "What would you change about…": "What would you change about ____, and why?",
+            "What matters most to you about…": "What matters most to you about ____?"
+        };
+
+        function updateProgress() {
+            const progress = (currentStep / 7) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('stepNum').textContent = currentStep;
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            updateProgress();
+            if(step===7) showFinal();
+        }
+
+        function nextStep() {
+            if (currentStep < 7) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function selectType(card, type) {
+            document.querySelectorAll('#step2 .card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedType = type;
+            document.getElementById('typeFeedback').classList.add('show');
+            document.getElementById('typeFeedback').textContent = "Selected: " + card.querySelector('h4').textContent;
+        }
+
+        function selectFocus(card, focus) {
+            document.querySelectorAll('#step3 .choice-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedFocus = focus;
+            document.getElementById('focusFeedback').classList.add('show');
+            document.getElementById('focusFeedback').textContent = "Selected: " + focus;
+        }
+
+        function selectRole(card, role, def, ex) {
+            document.querySelectorAll('#step4 .role-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedRole = role;
+            roleDef = def;
+            roleEx = ex;
+            document.getElementById('roleFeedback').classList.add('show');
+            document.getElementById('roleFeedback').innerHTML =
+                `<strong>${role}:</strong> ${def}<br><em>Example: ${ex}</em>`;
+        }
+
+        function selectStem(card, stem) {
+            document.querySelectorAll('#step5 .choice-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedStem = stem;
+            document.getElementById('customStem').value = '';
+            showStemExample(stem);
+        }
+
+        function setCustomStem(input) {
+            selectedStem = input.value;
+            document.querySelectorAll('#step5 .choice-card').forEach(c => c.classList.remove('selected'));
+            showStemExample(selectedStem);
+        }
+
+        function showStemExample(stem) {
+            if (stem) {
+                document.getElementById('stemExampleBox').style.display = 'block';
+                document.getElementById('stemExample').textContent = stemExamples[stem] || (stem ? stem + ' ...' : '');
+            } else {
+                document.getElementById('stemExampleBox').style.display = 'none';
+            }
+        }
+
+        function showFinal() {
+            document.getElementById('finalQ').textContent = document.getElementById('interviewQuestion').value || "Your question will appear here...";
+            document.getElementById('finalF').textContent = document.getElementById('followup').value || "None added";
+            document.getElementById('finalTied').textContent = document.getElementById('q_tied').value || "—";
+            document.getElementById('finalOpen').textContent = document.getElementById('q_open').value || "—";
+            document.getElementById('finalNeutral').textContent = document.getElementById('q_neutral').value || "—";
+            document.getElementById('finalClear').textContent = document.getElementById('q_clear').value || "—";
+            document.getElementById('finalDetail').textContent = document.getElementById('q_detail').value || "—";
+        }
+
+        function restart() {
+            currentStep = 1;
+            selectedType = '';
+            selectedFocus = '';
+            selectedRole = '';
+            selectedStem = '';
+            roleDef = '';
+            roleEx = '';
+            document.querySelectorAll('.card,.choice-card,.role-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('input, textarea').forEach(e => { e.value = ''; });
+            document.getElementById('stemExampleBox').style.display='none';
+            document.querySelectorAll('.feedback').forEach(f => { f.classList.remove('show'); f.textContent=''; });
+            showStep(1);
+        }
+
+        updateProgress();
+    </script>
 </body>
 </html>
