@@ -2,415 +2,77 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Research Interview Question Builder (Public Health)</title>
+<title>Research Interview Question Builder (Step by Step)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  :root{--b:#0f172a;--m:#475569;--l:#64748b;--bd:#cbd5e1;--p:#f8fafc;--accent:#0f172a}
-  *{box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--b);margin:0;background:#fff}
-  .wrap{max-width:1040px;margin:24px auto;padding:0 16px}
-  h1{font-size:1.7rem;margin:.2rem 0 .6rem}
-  h2{margin:.2rem 0 .35rem}
-  .panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin:12px 0}
-  .soft{background:#f8fafc}
-  .muted{color:#475569}
-  .hint{color:#64748b;margin:.25rem 0 .5rem}
-  textarea,input[type=text]{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:16px;font-size:1.14rem;min-height:90px}
-  textarea{resize:vertical}
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:10px 16px;font-size:1rem;cursor:pointer}
-  .chip[aria-pressed="true"],.chip:focus{background:#0f172a;color:#fff;border-color:#0f172a}
-  .chip:focus{outline:2px solid #2acaea}
-  .summary,.exbox{border:1px dashed #cbd5e1;background:#fff;border-radius:12px;padding:16px}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;justify-content:center}
-  .btn{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:14px 26px;font-size:1.05rem;cursor:pointer;font-weight:600}
-  .btn.primary{background:#0f172a;color:#fff;border-color:#0f172a}
-  .btn:focus{outline:2px solid #2acaea}
-  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-  .kicker{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
-  table{width:100%;border-collapse:collapse;font-size:1rem}
-  th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}
-  thead th{background:#f1f5f9}
-  .tiny{font-size:.89rem}
-  .hidden{display:none!important}
-  .status-message{background:#e0f2fe;color:#0f172a;padding:10px 18px;border-radius:8px;text-align:center;font-size:1rem;margin:18px 0;display:none}
-  @media (max-width:600px){
-    .wrap{padding:0 4px}
-    .panel,.soft{padding:8px}
-    .chips{gap:4px}
-    .btn{padding:12px 7px;font-size:1rem}
-    .row{grid-template-columns:1fr}
-    textarea,input[type=text]{font-size:1rem;min-height:70px;}
-  }
+  .hidden { display: none !important; }
+  body { font-family: system-ui, sans-serif; background: #f6f6f9; }
+  .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 24px auto; max-width: 700px; }
+  textarea, input[type=text] { width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; font-size: 1.14rem; min-height: 90px; margin-bottom: 14px; }
+  .toolbar { margin-top: 16px; display: flex; gap: 8px; justify-content: center; }
+  .btn { border: 1px solid #cbd5e1; background: #fff; border-radius: 10px; padding: 14px 26px; font-size: 1.05rem; cursor: pointer; font-weight: 600; }
+  .btn.primary { background: #0f172a; color: #fff; border-color: #0f172a; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div id="statusMessage" class="status-message" aria-live="polite"></div>
-
-  <!-- Step 1: Intro & RQ -->
-  <section class="panel soft" id="step1">
-    <h1>Research Interview Question Builder</h1>
-    <p class="muted">
-      This step-by-step tool helps you draft a <strong>research interview question</strong> for a public-health study (not a job interview).<br>
-      You'll review question types, choose a <em>focus</em>, select a <em>question role</em>, pick a <em>stem</em>, draft your question, and complete a <em>quality check</em>.
-    </p>
-    <div class="kicker">Start here</div>
-    <h2>Your Research Question (RQ)</h2>
-    <p class="hint">Type the RQ guiding your interview. Your interview question must help generate evidence toward this RQ.</p>
-    <textarea id="rq" rows="4" placeholder="e.g., How do transportation barriers influence missed prenatal appointments among low-income patients?"></textarea>
+<div>
+  <!-- Step 1 -->
+  <section id="step1" class="panel">
+    <h2>Step 1: Your Research Question (RQ)</h2>
+    <textarea id="rq" rows="4" placeholder="Type your research question here..."></textarea>
     <div class="toolbar">
       <button class="btn primary" id="step1Next">Next</button>
     </div>
   </section>
-
-  <!-- Step 2: Types reference -->
-  <section class="panel hidden" id="step2">
-    <div class="kicker">Step 1</div>
-    <h2>Types of Interview Questions (reference)</h2>
-    <p class="hint">Skim this before drafting. Prefer open-ended & probing; avoid leading & double-barreled.</p>
-    <table aria-label="Types of interview questions">
-      <thead>
-        <tr><th>Type</th><th>Description</th><th>Public-health example</th><th>Use</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Open-ended</td><td>Invites depth/story; “how/what/in what ways”.</td><td>“Can you describe how access to transportation affects getting to clinic appointments?”</td><td>Yes</td></tr>
-        <tr><td>Probing</td><td>Follow-up to deepen a prior answer.</td><td>“Can you say more about that?” · “What happened next?”</td><td>Yes</td></tr>
-        <tr><td>Demographic</td><td>Brief background context.</td><td>“How would you describe your housing situation?”</td><td>Yes, briefly</td></tr>
-        <tr><td>Closed</td><td>Yes/No or short choice.</td><td>“Do you have health insurance?”</td><td>Use sparingly</td></tr>
-        <tr><td>Leading</td><td>Suggests a “right” answer.</td><td>“Wouldn’t you agree that vaping is obviously harmful?”</td><td>No</td></tr>
-        <tr><td>Double-barreled</td><td>Asks two things at once.</td><td>“How do cost <em>and</em> transport affect appointments?”</td><td>Split it</td></tr>
-        <tr><td>Hypothetical</td><td>Imagined scenario.</td><td>“If the clinic moved farther, how would you handle visits?”</td><td>Use cautiously</td></tr>
-      </tbody>
-    </table>
+  <!-- Step 2 -->
+  <section id="step2" class="panel hidden">
+    <h2>Step 2: Types of Interview Questions</h2>
+    <p>...your table and content...</p>
     <div class="toolbar">
       <button class="btn" id="step2Prev">Back</button>
       <button class="btn primary" id="step2Next">Next</button>
     </div>
   </section>
-
-  <!-- Step 3: Focus -->
-  <section class="panel soft hidden" id="step3">
-    <div class="kicker">Step 2</div>
-    <h2>Choose a Focus</h2>
-    <p class="hint">Select ONE lens so your question is tight and aligned with your RQ.</p>
-    <div id="focusChips" class="chips" role="tablist" aria-label="Focus"></div>
-    <p class="tiny muted" style="margin-top:.5rem">Options: Background/Context · Experience · Impact · Barriers · Supports · Solutions/Recommendations</p>
+  <!-- Step 3 -->
+  <section id="step3" class="panel hidden">
+    <h2>Step 3: Choose a Focus</h2>
+    <p>...your chips/buttons...</p>
     <div class="toolbar">
       <button class="btn" id="step3Prev">Back</button>
       <button class="btn primary" id="step3Next">Next</button>
     </div>
   </section>
-
-  <!-- Step 4: Role -->
-  <section class="panel hidden" id="step4">
-    <div class="kicker">Step 3</div>
-    <h2>Identify the Question Role</h2>
-    <p class="hint">Pick one. We’ll show a definition and an example.</p>
-    <div id="roleChips" class="chips" role="tablist" aria-label="Question role"></div>
-    <div class="summary tiny" style="margin-top:10px">
-      <div><span class="kicker">Role</span> <span id="roleLabel">—</span></div>
-      <div id="roleDef" class="muted" style="margin-top:4px">Select a role to see its purpose.</div>
-      <div class="kicker" style="margin-top:10px">Example</div>
-      <div id="roleEx" style="font-weight:600; margin-top:4px">—</div>
-    </div>
+  <!-- Step 4 -->
+  <section id="step4" class="panel hidden">
+    <h2>Step 4: Draft Your Interview Question</h2>
+    <textarea rows="4" placeholder="Type your interview question here..."></textarea>
     <div class="toolbar">
       <button class="btn" id="step4Prev">Back</button>
       <button class="btn primary" id="step4Next">Next</button>
     </div>
   </section>
-
-  <!-- Step 5: Stems + draft -->
-  <section class="panel soft hidden" id="step5">
-    <div class="kicker">Step 4</div>
-    <h2>Pick a Stem → See an Example → Write Your Interview Question</h2>
-    <p class="hint">Click a stem (or type your own). Then rewrite the example as a single, neutral, open-ended prompt.</p>
-    <div class="tiny">Stem (click to select)</div>
-    <div id="stemChips" class="chips" aria-label="Stem choices"></div>
-    <div style="height:8px"></div>
-    <input id="stem" type="text" class="big" placeholder="e.g., In what ways…">
-    <div style="height:12px"></div>
-    <div class="exbox">
-      <div class="kicker">Auto-example (based on your stem)</div>
-      <div id="stemExample" style="font-weight:600; margin-top:4px;">In what ways does ____ affect ____?</div>
-    </div>
-    <label class="tiny" for="question">Your research interview question (rewrite in your own words)</label>
-    <textarea id="question" class="big" rows="4" placeholder="Type your final interview question here…"></textarea>
-    <label class="tiny" for="follow">Optional follow-up (for short answers)</label>
-    <textarea id="follow" class="big" rows="2" placeholder="e.g., Can you give a specific example? / What happened next? / How did that affect you?"></textarea>
-    <div class="toolbar">
-      <button class="btn" id="step5Prev">Back</button>
-      <button class="btn primary" id="step5Next">Next</button>
-    </div>
-  </section>
-
-  <!-- Step 6: Preview -->
-  <section class="panel hidden" id="step6">
-    <div class="kicker">Step 5</div>
-    <h2>Your Selections & Live Preview</h2>
-    <div class="summary tiny" id="selectionsBox" style="white-space:pre-wrap"></div>
-    <div class="exbox" id="previewBox" style="white-space:pre-wrap; margin-top:10px"></div>
-    <div class="toolbar">
-      <button class="btn" id="step6Prev">Back</button>
-      <button class="btn primary" id="step6Next">Next</button>
-      <button class="btn primary" id="copyBtn">Copy</button>
-      <button class="btn" onclick="window.print()">Print</button>
-      <button class="btn" id="resetBtn">Reset</button>
-    </div>
-  </section>
-
-  <!-- Step 7: Quality check -->
-  <section class="panel soft hidden" id="step7">
-    <div class="kicker">Step 6</div>
-    <h2>Quality Check (typed reflection; optional checkboxes)</h2>
-    <p class="hint">Write 1 sentence for each item (and optionally tick the box).</p>
-    <div class="row">
-      <div>
-        <label class="tiny"><input type="checkbox" id="c_ties"> Tied to RQ & focus</label>
-        <textarea id="r_ties" class="big" rows="3" placeholder="How does this prompt generate evidence for your RQ?"></textarea>
-      </div>
-      <div>
-        <label class="tiny"><input type="checkbox" id="c_open"> Open-ended</label>
-        <textarea id="r_open" class="big" rows="3" placeholder="Why can’t this be answered with yes/no?"></textarea>
-      </div>
-      <div>
-        <label class="tiny"><input type="checkbox" id="c_neutral"> Neutral</label>
-        <textarea id="r_neutral" class="big" rows="3" placeholder="What assumptions did you remove? Any loaded words?"></textarea>
-      </div>
-      <div>
-        <label class="tiny"><input type="checkbox" id="c_clear"> Clear wording</label>
-        <textarea id="r_clear" class="big" rows="3" placeholder="Which jargon/acronyms did you avoid or explain?"></textarea>
-      </div>
-      <div>
-        <label class="tiny"><input type="checkbox" id="c_detail"> Invites detail</label>
-        <textarea id="r_detail" class="big" rows="3" placeholder="How does it elicit stories, sequences, or examples?"></textarea>
-      </div>
-    </div>
-    <div class="toolbar">
-      <button class="btn" id="step7Prev">Back</button>
-      <button class="btn primary" id="step7Next">Finish</button>
-    </div>
-  </section>
-
-  <!-- Step 8: Done -->
-  <section class="panel soft hidden" id="step8">
-    <h2>All Done!</h2>
-    <div class="exbox" id="finalPreview" style="white-space:pre-wrap"></div>
-    <div class="toolbar">
-      <button class="btn primary" id="restartBtn">Start Over</button>
-    </div>
-    <p class="muted tiny" style="text-align:center; margin-top:10px">Drafts are saved locally in this browser.</p>
-  </section>
+  <!-- ... repeat for all steps ... -->
 </div>
-
 <script>
-(function(){
-  // ----- Data -----
-  const FOCUS = [
-    { id:"background", label:"Background / Context" },
-    { id:"experience", label:"Experience" },
-    { id:"impact", label:"Impact" },
-    { id:"barriers", label:"Barriers" },
-    { id:"supports", label:"Supports" },
-    { id:"solutions", label:"Solutions / Recommendations" }
-  ];
-  const ROLES = [
-    { id:"intro",   label:"Introductory", def:"Warm-up to ease into the topic and establish context.",
-      ex:"Can you tell me about alcohol use among your peers?" },
-    { id:"core",    label:"Core", def:"Heart of the research; targets your main concept.",
-      ex:"How do you think alcohol affects stress?" },
-    { id:"follow",  label:"Follow-Up", def:"Adds depth or clarification after a short/unclear answer.",
-      ex:"Can you give an example?" },
-    { id:"closing", label:"Closing", def:"Invites reflection, advice, or takeaway at the end.",
-      ex:"What advice would you give a friend about alcohol and mental health?" }
-  ];
-  const STEMS = [
-    "How do you…",
-    "What happens when…",
-    "In what ways…",
-    "Can you walk me through…",
-    "Tell me about a time when…",
-    "What would you change about…",
-    "What matters most to you about…"
-  ];
-  const STEM_PATTERNS = {
-    "How do you…": "How do you ____ when ____?",
-    "What happens when…": "What happens when ____? Can you give an example?",
-    "In what ways…": "In what ways does ____ affect ____?",
-    "Can you walk me through…": "Can you walk me through ____ from start to finish?",
-    "Tell me about a time when…": "Tell me about a time when ____. What happened?",
-    "What would you change about…": "What would you change about ____, and why?",
-    "What matters most to you about…": "What matters most to you about ____?"
-  };
-
-  // ----- Elements -----
-  const $ = (id)=>document.getElementById(id);
-  const statusMsg = $("statusMessage");
-  const steps = [1,2,3,4,5,6,7,8].map(i => $("step"+i));
-  let currentStep = 1;
-
-  // ----- Chips -----
-  let selectedFocus = null;
-  let selectedRole = null;
-  const focusChips = $("focusChips");
-  const roleChips = $("roleChips");
-  const roleLabel = $("roleLabel");
-  const roleDef = $("roleDef");
-  const roleEx = $("roleEx");
-  const stemChips = $("stemChips");
-  const stem = $("stem");
-  const stemExample = $("stemExample");
-
-  FOCUS.forEach(f=>{
-    const btn = document.createElement("button");
-    btn.className="chip"; btn.type="button"; btn.setAttribute("aria-pressed","false");
-    btn.textContent=f.label;
-    btn.onclick=()=>{
-      [...focusChips.querySelectorAll(".chip")].forEach(b=>b.setAttribute("aria-pressed","false"));
-      btn.setAttribute("aria-pressed","true"); selectedFocus=f; save(); render();
-    };
-    focusChips.appendChild(btn);
-  });
-  ROLES.forEach(r=>{
-    const btn = document.createElement("button");
-    btn.className="chip"; btn.type="button"; btn.setAttribute("aria-pressed","false");
-    btn.textContent=r.label;
-    btn.onclick=()=>{
-      [...roleChips.querySelectorAll(".chip")].forEach(b=>b.setAttribute("aria-pressed","false"));
-      btn.setAttribute("aria-pressed","true"); selectedRole=r;
-      roleLabel.textContent=r.label+" question"; roleDef.textContent=r.def; roleEx.textContent=r.ex;
-      save(); render();
-    };
-    roleChips.appendChild(btn);
-  });
-  STEMS.forEach(s=>{
-    const btn = document.createElement("button");
-    btn.className="chip"; btn.type="button"; btn.setAttribute("aria-pressed","false");
-    btn.textContent=s;
-    btn.onclick=()=>{
-      [...stemChips.querySelectorAll(".chip")].forEach(b=>b.setAttribute("aria-pressed","false"));
-      btn.setAttribute("aria-pressed","true"); stem.value=s; render();
-    };
-    stemChips.appendChild(btn);
-  });
-
-  // ----- Navigation -----
-  function goToStep(num) {
-    steps.forEach((el,i) => el.classList.toggle("hidden", (i+1)!==num));
-    currentStep = num;
-    window.scrollTo({top:0,behavior:"smooth"});
-    postHeight();
+function goToStep(num) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step' + i);
+    if (el) {
+      el.classList.toggle('hidden', i !== num);
+    }
   }
-  $("step1Next").onclick = ()=> goToStep(2);
-  $("step2Prev").onclick = ()=> goToStep(1);
-  $("step2Next").onclick = ()=> goToStep(3);
-  $("step3Prev").onclick = ()=> goToStep(2);
-  $("step3Next").onclick = ()=> goToStep(4);
-  $("step4Prev").onclick = ()=> goToStep(3);
-  $("step4Next").onclick = ()=> goToStep(5);
-  $("step5Prev").onclick = ()=> goToStep(4);
-  $("step5Next").onclick = ()=> goToStep(6);
-  $("step6Prev").onclick = ()=> goToStep(5);
-  $("step6Next").onclick = ()=> { goToStep(7); render(); };
-  $("step7Prev").onclick = ()=> goToStep(6);
-  $("step7Next").onclick = ()=> { showFinal(); goToStep(8); };
-  $("restartBtn").onclick = ()=> { $("resetBtn").onclick(); goToStep(1); };
-
-  // ----- Render -----
-  const rq = $("rq");
-  const question = $("question");
-  const follow = $("follow");
-  const selectionsBox = $("selectionsBox");
-  const preview = $("previewBox");
-  const finalPreview = $("finalPreview");
-  const qIds = ["r_ties","r_open","r_neutral","r_clear","r_detail","c_ties","c_open","c_neutral","c_clear","c_detail"];
-  const qEls = Object.fromEntries(qIds.map(id=>[id,$(id)]));
-
-  function buildExample(){
-    const s=(stem.value||"").trim();
-    stemExample.textContent = STEM_PATTERNS[s] || (s ? s+" …" : "In what ways does ____ affect ____?");
-  }
-  function buildSelections(){
-    const lines=[];
-    lines.push("Your selections");
-    lines.push("• RQ: " + (rq.value.trim() || "—"));
-    lines.push("• Focus: " + (selectedFocus?selectedFocus.label:"—"));
-    lines.push("• Role: " + (selectedRole?selectedRole.label:"—"));
-    lines.push("• Stem: " + ((stem.value||"").trim() || "—"));
-    selectionsBox.textContent = lines.join("\n");
-  }
-  function buildPreview(){
-    const lines=[];
-    lines.push("Research Question (RQ): " + (rq.value.trim() || "—"));
-    lines.push("Interview Question: " + (question.value.trim() || ((stem.value.trim()? stem.value.trim()+" …" : "—"))));
-    lines.push("Optional follow-up: " + (follow.value.trim() || "—"));
-    lines.push("");
-    lines.push("Quality reflections:");
-    lines.push("• Tied to RQ & focus: " + (qEls.r_ties.value.trim() || "—"));
-    lines.push("• Open-ended: " + (qEls.r_open.value.trim() || "—"));
-    lines.push("• Neutral: " + (qEls.r_neutral.value.trim() || "—"));
-    lines.push("• Clear wording: " + (qEls.r_clear.value.trim() || "—"));
-    lines.push("• Invites detail: " + (qEls.r_detail.value.trim() || "—"));
-    preview.textContent = lines.join("\n");
-  }
-  function render(){ buildExample(); buildSelections(); buildPreview(); postHeight(); }
-  function showFinal(){ finalPreview.textContent = preview.textContent; }
-
-  // ----- Buttons -----
-  $("copyBtn").onclick = async ()=>{
-    try{ await navigator.clipboard.writeText(preview.textContent); alert("Copied to clipboard."); }
-    catch{ window.prompt("Copy the text below:", preview.textContent); }
-  };
-  $("resetBtn").onclick = ()=>{
-    if(!confirm("Clear all fields?")) return;
-    rq.value=""; stem.value=""; question.value=""; follow.value="";
-    selectedFocus=null; selectedRole=null;
-    [...focusChips.querySelectorAll(".chip"), ...roleChips.querySelectorAll(".chip"), ...stemChips.querySelectorAll(".chip")]
-      .forEach(b=>b.setAttribute("aria-pressed","false"));
-    roleLabel.textContent="—"; roleDef.textContent="Select a role to see its purpose."; roleEx.textContent="—";
-    Object.values(qEls).forEach(el=>{ if(el.type==="checkbox") el.checked=false; else el.value=""; });
-    save(); render(); goToStep(1);
-  };
-
-  // ----- Autosave -----
-  const KEY="research-iq-builder-v1";
-  function save(){
-    const s={ rq:rq.value, stem:stem.value, question:question.value, follow:follow.value,
-      focus:selectedFocus?selectedFocus.id:null, role:selectedRole?selectedRole.id:null,
-      q:{ r_ties:qEls.r_ties.value,r_open:qEls.r_open.value,r_neutral:qEls.r_neutral.value,
-          r_clear:qEls.r_clear.value,r_detail:qEls.r_detail.value,
-          c_ties:qEls.c_ties.checked,c_open:qEls.c_open.checked,c_neutral:qEls.c_neutral.checked,
-          c_clear:qEls.c_clear.checked,c_detail:qEls.c_detail.checked } };
-    localStorage.setItem(KEY, JSON.stringify(s));
-  }
-  function load(){
-    try{
-      const raw=localStorage.getItem(KEY); if(!raw) return;
-      const s=JSON.parse(raw);
-      rq.value=s.rq||""; stem.value=s.stem||""; question.value=s.question||""; follow.value=s.follow||"";
-      if(s.focus){ const i=FOCUS.findIndex(f=>f.id===s.focus); if(i>=0) focusChips.children[i].click(); }
-      if(s.role){  const j=ROLES.findIndex(r=>r.id===s.role); if(j>=0) roleChips.children[j].click(); }
-      if(s.q){
-        qEls.r_ties.value=s.q.r_ties||""; qEls.r_open.value=s.q.r_open||""; qEls.r_neutral.value=s.q.r_neutral||"";
-        qEls.r_clear.value=s.q.r_clear||""; qEls.r_detail.value=s.q.r_detail||"";
-        qEls.c_ties.checked=!!s.q.c_ties; qEls.c_open.checked=!!s.q.c_open; qEls.c_neutral.checked=!!s.q.c_neutral;
-        qEls.c_clear.checked=!!s.q.c_clear; qEls.c_detail.checked=!!s.q.c_detail;
-      }
-    }catch(e){}
-  }
-  document.addEventListener("input", ()=>{ save(); render(); });
-  document.addEventListener("change", ()=>{ save(); render(); });
-  load(); render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.getElementById('step1Next').onclick = () => goToStep(2);
+document.getElementById('step2Prev').onclick = () => goToStep(1);
+document.getElementById('step2Next').onclick = () => goToStep(3);
+document.getElementById('step3Prev').onclick = () => goToStep(2);
+document.getElementById('step3Next').onclick = () => goToStep(4);
+document.getElementById('step4Prev').onclick = () => goToStep(3);
+document.getElementById('step4Next').onclick = () => goToStep(1); // or next step
+document.addEventListener('DOMContentLoaded', function() {
   goToStep(1);
-
-  // Iframe auto-height messaging (for Canvas)
-  function postHeight(){
-    if(!window.parent || window.parent===window) return;
-    const h=document.documentElement.scrollHeight;
-    window.parent.postMessage({type:"iqb-height", height:h}, "*");
-  }
-  new ResizeObserver(postHeight).observe(document.documentElement);
-})();
+});
 </script>
 </body>
 </html>
